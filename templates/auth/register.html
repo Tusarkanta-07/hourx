@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Join - HOURX{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center py-10">
+    <div
+        class="glass-panel w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl animate-fade-in relative z-10">
+
+        <!-- Form Side -->
+        <div class="p-8 md:p-12 bg-white/60 backdrop-blur-xl flex flex-col justify-center order-2 md:order-1">
+            <div class="mb-8">
+                <h2 class="text-3xl font-heading font-bold text-slate-800 mb-2">Create Account</h2>
+                <p class="text-slate-500">Join the community and start trading today.</p>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+
+                {% for field in form %}
+                <div class="group">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <p class="text-slate-400 text-xs mt-1 pl-1">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                    <p class="text-red-500 text-xs mt-1 font-bold pl-1"><i
+                            class="fa-solid fa-circle-exclamation mr-1"></i> {{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+                <script>
+                    document.querySelectorAll('.glass-panel input, .glass-panel textarea, .glass-panel select').forEach(el => {
+                        if (el.type !== 'checkbox' && el.type !== 'file') {
+                            el.classList.add('form-control', 'w-full', 'hover:border-indigo-300', 'transition-colors');
+                            if (el.name === 'username') el.placeholder = 'Choose a unique username';
+                            if (el.name === 'email') el.placeholder = 'name@example.com';
+                        }
+                        if (el.tagName === 'TEXTAREA') {
+                            // Make bio resizable specifically
+                            el.classList.add('resize-y', 'h-24', 'max-h-64', 'min-h-[60px]');
+                        }
+                        if (el.type === 'file') {
+                            el.classList.add('block', 'w-full', 'text-sm', 'text-slate-500',
+                                'file:mr-4', 'file:py-2', 'file:px-4', 'file:rounded-full', 'file:border-0',
+                                'file:text-sm', 'file:font-semibold', 'file:bg-indigo-50', 'file:text-indigo-700', 'file:cursor-pointer', 'hover:file:bg-indigo-100', 'transition-all');
+                        }
+                    });
+                </script>
+
+                <div class="pt-4">
+                    <button type="submit"
+                        class="w-full btn btn-primary py-3.5 text-lg shadow-xl shadow-indigo-200 hover:shadow-2xl hover:shadow-indigo-300">
+                        Register Account <i class="fa-solid fa-user-plus ml-2 text-sm"></i>
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 text-center pt-6 border-t border-slate-200">
+                <p class="text-slate-500">
+                    Already have an account?
+                    <a href="{% url 'login' %}"
+                        class="font-bold text-indigo-600 hover:text-indigo-800 transition-colors">Log in</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Visual Side -->
+        <div
+            class="hidden md:flex flex-col justify-center p-12 bg-gradient-to-bl from-emerald-500 via-teal-600 to-cyan-600 text-white relative overflow-hidden order-1 md:order-2">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10">
+            </div>
+            <div class="absolute bottom-0 right-0 p-12 opacity-20 transform translate-x-1/4 translate-y-1/4">
+                <i class="fa-solid fa-hand-holding-hand text-[14rem]"></i>
+            </div>
+
+            <div class="relative z-10 space-y-8 text-right">
+                <h2 class="text-4xl font-heading font-bold leading-tight">Share Skills.<br>Gain Freedom.</h2>
+                <div class="space-y-4">
+                    <div
+                        class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/20 text-left transform transition hover:scale-105 duration-300">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div
+                                class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-teal-600 font-bold">
+                                <i class="fa-solid fa-check"></i></div>
+                            <span class="font-bold">No Hidden Fees</span>
+                        </div>
+                        <p class="text-sm opacity-90">Completely free peer-to-peer exchange.</p>
+                    </div>
+
+                    <div
+                        class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/20 text-left transform transition hover:scale-105 duration-300 translate-x-4">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div
+                                class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-teal-600 font-bold">
+                                <i class="fa-solid fa-shield-halved"></i></div>
+                            <span class="font-bold">Trust & Safety</span>
+                        </div>
+                        <p class="text-sm opacity-90">Verified profiles and secure escrow.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

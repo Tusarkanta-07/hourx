@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}{{ skill.title }} - Service{% endblock %}
+
+{% block content %}
+<div class="container section-py">
+    <!-- Breadcrumb -->
+    <div class="mb-4 text-sm text-muted">
+        <a href="{% url 'skill_list' %}">Marketplace</a> / <span>{{ skill.title }}</span>
+    </div>
+
+    <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 48px;">
+        <!-- Left content -->
+        <div>
+            <h1 style="font-size: 40px; margin-bottom: 24px;">{{ skill.title }}</h1>
+
+            <div class="flex items-center gap-4 mb-4"
+                style="padding-bottom: 24px; border-bottom: 1px solid var(--border-light);">
+                <div
+                    style="width: 48px; height: 48px; background: var(--text-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600;">
+                    {% if skill.user.profile_picture %}
+                    <img src="{{ skill.user.profile_picture.url }}"
+                        style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                    {% else %}
+                    {{ skill.user.username|slice:":1"|upper }}
+                    {% endif %}
+                </div>
+                <div>
+                    <div style="font-weight: 600;">{{ skill.user.username }}</div>
+                    <div class="text-xs text-muted">Posted {{ skill.created_at|date:"M d, Y" }}</div>
+                </div>
+            </div>
+
+            <div style="font-size: 18px; line-height: 1.6; color: var(--text-secondary);">
+                {{ skill.description|linebreaksbr }}
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div>
+            <div class="card" style="position: sticky; top: 100px;">
+                <h3 style="font-size: 20px; margin-bottom: 16px;">Request Service</h3>
+                <div class="flex justify-between mb-4 text-sm">
+                    <span class="text-muted">Cost</span>
+                    <span class="font-bold">Negotiable</span>
+                </div>
+
+                {% if user != skill.user %}
+                <a href="{% url 'create_request' skill_id=skill.pk %}" class="btn btn-primary" style="width: 100%;">
+                    Request Now
+                </a>
+                <p class="text-xs text-muted text-center mt-2">Uses Time Credits</p>
+                {% else %}
+                <a href="{% url 'skill_edit' pk=skill.pk %}" class="btn btn-secondary" style="width: 100%;">
+                    Edit Listing
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }} - Profile{% endblock %}
+
+{% block content %}
+<div style="background: var(--bg-surface); padding: 48px 0; border-bottom: 1px solid var(--border-light);">
+    <div class="container">
+        <div class="flex items-center gap-6">
+            <div
+                style="width: 96px; height: 96px; background: white; border: 1px solid var(--border-medium); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700;">
+                {% if user.profile_picture %}
+                <img src="{{ user.profile_picture.url }}"
+                    style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                {{ user.username|slice:":1"|upper }}
+                {% endif %}
+            </div>
+            <div>
+                <h1 style="font-size: 32px; margin-bottom: 4px;">{{ user.username }}</h1>
+                <p class="text-muted">{{ user.email }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container section-py">
+    <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 48px;">
+        <div class="flex-col gap-8">
+            <!-- About -->
+            <section>
+                <h3 style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 16px;">
+                    About</h3>
+                {% if user.bio %}
+                <p class="text-secondary">{{ user.bio|linebreaksbr }}</p>
+                {% else %}
+                <p class="text-muted italic">No bio provided.</p>
+                {% endif %}
+            </section>
+
+            <!-- Services -->
+            <section>
+                <div class="flex justify-between items-center mb-4 border-bottom"
+                    style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px;">
+                    <h3 style="margin: 0;">Services</h3>
+                    {% if request.user == user %}
+                    <a href="{% url 'skill_create' %}" class="text-sm font-bold text-primary">+ Add</a>
+                    {% endif %}
+                </div>
+
+                {% if user.skills.all %}
+                <div class="flex-col gap-4">
+                    {% for skill in user.skills.all %}
+                    <a href="{% url 'skill_detail' pk=skill.pk %}" class="card"
+                        style="display:flex; justify-content: space-between; align-items: center; padding: 16px;">
+                        <div>
+                            <div class="font-bold">{{ skill.title }}</div>
+                            <div class="text-xs text-muted">{{ skill.description|truncatechars:60 }}</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-muted text-xs"></i>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No services listed.</p>
+                {% endif %}
+            </section>
+        </div>
+
+        <div>
+            <div class="card">
+                <h3 style="font-size: 18px; margin-bottom: 16px;">Stats</h3>
+                <div class="flex justify-between py-2 border-bottom"
+                    style="border-bottom: 1px solid var(--border-light);">
+                    <span class="text-muted">Joined</span>
+                    <span class="font-bold">{{ user.date_joined|date:"M Y" }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-bottom"
+                    style="border-bottom: 1px solid var(--border-light);">
+                    <span class="text-muted">Listings</span>
+                    <span class="font-bold">{{ user.skills.count }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

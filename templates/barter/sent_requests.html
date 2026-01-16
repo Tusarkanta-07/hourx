@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Sent Requests - HOURX{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto animate-fade-in">
+    <h2 class="text-2xl font-bold font-heading mb-6">Sent Requests</h2>
+
+    {% if requests %}
+    <div class="space-y-4">
+        {% for req in requests %}
+        <div class="card p-6 hover-card">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
+                <div class="flex-grow">
+                    <div class="flex items-center gap-2 mb-1">
+                        <h3 class="font-bold text-lg">{{ req.skill.title }}</h3>
+                        {% if req.is_escrowed %}
+                        <span
+                            class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary border border-primary/20"
+                            title="Funds Locked">
+                            <i class="fa-solid fa-lock mr-1"></i>Escrow
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center gap-4 text-sm text-muted mb-3">
+                        <span class="flex items-center gap-1">
+                            <i class="fa-regular fa-user"></i> To: <span class="font-medium text-white">{{
+                                req.receiver.username }}</span>
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <i class="fa-regular fa-clock"></i> {{ req.hours }} hrs
+                        </span>
+                        <span class="text-xs opacity-70">{{ req.created_at|date:"M d, Y" }}</span>
+                    </div>
+
+                    <div
+                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide
+                            {% if req.status == 'PENDING' %}bg-amber-500/10 text-amber-500 border border-amber-500/20{% endif %}
+                            {% if req.status == 'ACCEPTED' %}bg-blue-500/10 text-blue-500 border border-blue-500/20{% endif %}
+                            {% if req.status == 'COMPLETED' %}bg-emerald-500/10 text-emerald-500 border border-emerald-500/20{% endif %}
+                            {% if req.status == 'REJECTED' %}bg-red-500/10 text-red-500 border border-red-500/20{% endif %}">
+                        <span class="w-1.5 h-1.5 rounded-full mr-2 
+                                {% if req.status == 'PENDING' %}bg-amber-500{% endif %}
+                                {% if req.status == 'ACCEPTED' %}bg-blue-500{% endif %}
+                                {% if req.status == 'COMPLETED' %}bg-emerald-500{% endif %}
+                                {% if req.status == 'REJECTED' %}bg-red-500{% endif %}"></span>
+                        {{ req.get_status_display }}
+                    </div>
+                </div>
+
+                <div class="flex-shrink-0 pt-1">
+                    {% if req.status == 'ACCEPTED' %}
+                    <form action="{% url 'complete_request' req.pk %}" method="post"
+                        onsubmit="return confirm('Confirm completion? This will release funds to {{ req.receiver.username }}.');">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0">
+                            <i class="fa-solid fa-check mr-1"></i>Mark Complete
+                        </button>
+                    </form>
+                    {% elif req.status == 'COMPLETED' %}
+                    <a href="{% url 'add_review' user_id=req.receiver.pk %}" class="btn btn-secondary btn-sm">
+                        <i class="fa-regular fa-star mr-1"></i> Leave Review
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card text-center py-16 border-dashed">
+        <div class="w-16 h-16 bg-surface-light rounded-full flex items-center justify-center mx-auto mb-4 text-muted">
+            <i class="fa-regular fa-paper-plane text-2xl"></i>
+        </div>
+        <p class="text-muted mb-4">You haven't sent any requests yet.</p>
+        <a href="{% url 'skill_list' %}" class="text-primary font-semibold hover:underline">Browse Skills</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
