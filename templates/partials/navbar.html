@@ -1,10 +1,10 @@
 <nav class="navbar">
-    <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+    <div class="container flex justify-between items-center w-full">
         <!-- Brand -->
         <a href="{% url 'home' %}" class="nav-brand">HOURX</a>
 
         <!-- Links (Centered) -->
-        <div style="display: flex; gap: 24px;">
+        <div class="flex gap-6">
             {% if user.is_authenticated %}
             <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
             <a href="{% url 'skill_list' %}" class="nav-link">Marketplace</a>
@@ -16,15 +16,15 @@
         </div>
 
         <!-- Auth Actions -->
-        <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="nav-actions">
             {% if user.is_authenticated %}
-            <div class="badge" style="display: flex; align-items: center; gap: 6px;">
+            <div class="badge">
                 <i class="fa-regular fa-clock"></i>
                 <span>{{ user.time_balance }}h</span>
             </div>
             <form action="{% url 'logout' %}" method="post" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">Sign
+                <button type="submit" class="btn btn-outline" style="padding: 6px 12px; font-size: 13px;">Sign
                     Out</button>
             </form>
             {% else %}

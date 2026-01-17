@@ -651,8 +651,236 @@ h6 {
 }
 
 /* =========================================
-   4. UTILITIES (Replacing Tailwind)
+   6. NAVBAR STYLES
    ========================================= */
+.nav-brand {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #f3f4f6;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* =========================================
+   7. AUTHENTICATION PAGES (Login/Register)
+   ========================================= */
+.auth-container {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 1024px;
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 10;
+}
+
+@media (min-width: 768px) {
+  .auth-card {
+    flex-direction: row;
+    min-height: 600px;
+  }
+}
+
+.auth-visual {
+  flex: 1;
+  position: relative;
+  padding: 48px;
+  color: white;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-visual.login-bg {
+  background: linear-gradient(135deg, #4f46e5, #9333ea, #db2777);
+}
+
+.auth-visual.register-bg {
+  background: linear-gradient(135deg, #10b981, #0d9488, #0891b2);
+}
+
+.visual-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+}
+
+.visual-icon {
+  position: absolute;
+  opacity: 0.15;
+  font-size: 10rem;
+  pointer-events: none;
+}
+
+.login-icon {
+  top: 0;
+  right: 0;
+  transform: translate(30%, -30%);
+}
+
+.register-icon {
+  bottom: 0;
+  right: 0;
+  transform: translate(20%, 20%);
+}
+
+.visual-content {
+  position: relative;
+  z-index: 20;
+}
+
+.visual-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+
+.visual-text {
+  font-size: 1.125rem;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.auth-form-side {
+  flex: 1;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.form-header {
+  margin-bottom: 32px;
+}
+
+.form-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  margin-left: 4px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  transition: color 0.2s;
+}
+
+.form-control.with-icon {
+  padding-left: 44px;
+}
+
+.form-control:focus+.input-icon {
+  color: var(--color-brand);
+}
+
+.auth-footer {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-light);
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.link-primary {
+  color: var(--color-brand);
+  font-weight: 700;
+}
+
+.link-primary:hover {
+  color: var(--color-brand-hover);
+  text-decoration: underline;
+}
+
+/* Feature List (Register Page) */
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.feature-item {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.2s;
+}
+
+.feature-item:hover {
+  transform: scale(1.02);
+}
+
+.feature-icon-circle {
+  width: 32px;
+  height: 32px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0d9488;
+  font-weight: 700;
+}
 
 /* Flexbox */
 .flex {

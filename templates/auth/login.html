@@ -3,40 +3,35 @@
 {% block title %}Login - HOURX{% endblock %}
 
 {% block content %}
-<div class="min-h-[80vh] flex items-center justify-center py-10">
-    <div
-        class="glass-panel w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl animate-fade-in relative z-10">
+<div class="auth-container">
+    <div class="auth-card animate-fade-in">
 
         <!-- Visual Side -->
-        <div
-            class="hidden md:flex flex-col justify-center p-12 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white relative overflow-hidden">
-            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10">
-            </div>
-            <div class="absolute top-0 right-0 p-12 opacity-20 transform translate-x-1/2 -translate-y-1/2">
-                <i class="fa-regular fa-clock text-[12rem]"></i>
-            </div>
+        <div class="auth-visual login-bg">
+            <div class="visual-pattern"></div>
+            <i class="fa-regular fa-clock visual-icon login-icon"></i>
 
-            <div class="relative z-10 space-y-6">
-                <h2 class="text-4xl font-heading font-bold leading-tight">Time is the new <br>Currency.</h2>
-                <p class="text-indigo-100 text-lg leading-relaxed opacity-90">Join the revolution where your skills
-                    translate directly into value. Log in to check your balance and start trading.</p>
+            <div class="visual-content">
+                <h2 class="visual-title">Time is the new <br>Currency.</h2>
+                <p class="visual-text">Join the revolution where your skills translate directly into value. Log in to
+                    check your balance and start trading.</p>
 
-                <div class="flex gap-3 pt-4">
-                    <div class="w-12 h-1 bg-white/30 rounded-full"></div>
-                    <div class="w-12 h-1 bg-white/30 rounded-full"></div>
-                    <div class="w-12 h-1 bg-white rounded-full"></div>
+                <div class="flex gap-2" style="margin-top: 24px;">
+                    <div style="width: 40px; height: 4px; background: rgba(255,255,255,0.4); border-radius: 2px;"></div>
+                    <div style="width: 40px; height: 4px; background: rgba(255,255,255,0.4); border-radius: 2px;"></div>
+                    <div style="width: 40px; height: 4px; background: white; border-radius: 2px;"></div>
                 </div>
             </div>
         </div>
 
         <!-- Form Side -->
-        <div class="p-8 md:p-12 bg-white/60 backdrop-blur-xl flex flex-col justify-center">
-            <div class="mb-8">
-                <h2 class="text-3xl font-heading font-bold text-slate-800 mb-2">Welcome Back</h2>
+        <div class="auth-form-side">
+            <div class="form-header">
+                <h2 class="form-title">Welcome Back</h2>
                 <p class="text-slate-500">Please enter your details to sign in.</p>
             </div>
 
-            <form method="post" class="space-y-5">
+            <form method="post">
                 {% csrf_token %}
 
                 {% if form.non_field_errors %}
@@ -47,52 +42,37 @@
                 </div>
                 {% endif %}
 
-                <div>
-                    <label
-                        class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">Username</label>
-                    <div class="relative group">
-                        <input type="text" name="username"
-                            class="form-control pl-10 group-hover:border-indigo-300 transition-colors"
-                            placeholder="Enter your username" required>
-                        <i
-                            class="fa-regular fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors"></i>
-                    </div>
+                <div class="input-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control with-icon" placeholder="Enter your username"
+                        required>
+                    <i class="fa-regular fa-user input-icon"></i>
                 </div>
 
-                <div>
-                    <label
-                        class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">Password</label>
-                    <div class="relative group">
-                        <input type="password" name="password"
-                            class="form-control pl-10 group-hover:border-indigo-300 transition-colors"
-                            placeholder="••••••••" required>
-                        <i
-                            class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors"></i>
-                    </div>
+                <div class="input-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control with-icon" placeholder="••••••••"
+                        required>
+                    <i class="fa-solid fa-lock input-icon"></i>
                 </div>
 
-                <div class="flex justify-between items-center text-sm">
-                    <label
-                        class="flex items-center gap-2 cursor-pointer text-slate-500 hover:text-indigo-600 transition-colors">
-                        <input type="checkbox"
-                            class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                <div class="flex justify-between items-center text-sm mb-6">
+                    <label class="flex items-center gap-2 cursor-pointer text-slate-500">
+                        <input type="checkbox" style="accent-color: var(--color-brand);">
                         <span>Remember me</span>
                     </label>
-                    <a href="{% url 'password_reset' %}"
-                        class="font-bold text-indigo-600 hover:text-indigo-800 transition-colors">Forgot Password?</a>
+                    <a href="{% url 'password_reset' %}" class="link-primary">Forgot Password?</a>
                 </div>
 
-                <button type="submit"
-                    class="w-full btn btn-primary py-3.5 text-lg shadow-xl shadow-indigo-200 hover:shadow-2xl hover:shadow-indigo-300">
+                <button type="submit" class="btn btn-primary w-full btn-lg shadow-lg">
                     Sign In <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
                 </button>
             </form>
 
-            <div class="mt-8 text-center pt-6 border-t border-slate-200">
-                <p class="text-slate-500">
+            <div class="auth-footer">
+                <p>
                     Don't have an account?
-                    <a href="{% url 'register' %}"
-                        class="font-bold text-indigo-600 hover:text-indigo-800 transition-colors">Sign up for free</a>
+                    <a href="{% url 'register' %}" class="link-primary">Sign up for free</a>
                 </p>
             </div>
         </div>
