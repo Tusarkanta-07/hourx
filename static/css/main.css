@@ -342,6 +342,315 @@ h6 {
 }
 
 /* =========================================
+   5. FEATURE SPECIFIC STYLES (LANDING PAGE)
+   ========================================= */
+
+/* Hero Section */
+.hero-section {
+  padding: 80px 0;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  letter-spacing: -0.04em;
+}
+
+@media (min-width: 1024px) {
+  .hero-title {
+    font-size: 4.5rem;
+  }
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #4f46e5, #9333ea, #db2777);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto 40px;
+  line-height: 1.6;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
+  color: #4f46e5;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border-radius: 9999px;
+  margin-bottom: 32px;
+}
+
+.badge-pill .dot {
+  width: 8px;
+  height: 8px;
+  background: #4f46e5;
+  border-radius: 50%;
+}
+
+/* Advanced Buttons */
+.btn-lg {
+  padding: 16px 32px;
+  font-size: 1.125rem;
+}
+
+.btn-glow {
+  box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+}
+
+.btn-glow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 30px -5px rgba(79, 70, 229, 0.5);
+}
+
+.btn-outline {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #4b5563;
+}
+
+.btn-outline:hover {
+  border-color: #c7d2fe;
+  color: #4f46e5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  padding: 40px;
+  border-radius: 24px;
+  margin: 60px 0;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .border-left {
+    border-left: 1px solid #f1f5f9;
+  }
+}
+
+.stat-value {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.stat-value.text-brand {
+  color: var(--color-brand);
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+/* Features Section */
+.section-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.section-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  margin-bottom: 80px;
+}
+
+@media (min-width: 768px) {
+  .features-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.feature-card {
+  height: 100%;
+}
+
+.icon-box {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 24px;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .icon-box {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.bg-blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.bg-pink {
+  background: #fce7f3;
+  color: #db2777;
+}
+
+.bg-emerald {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  transition: color 0.3s ease;
+}
+
+.group-hover-blue:hover,
+.feature-card:hover .group-hover-blue {
+  color: #2563eb;
+}
+
+.group-hover-pink:hover,
+.feature-card:hover .group-hover-pink {
+  color: #db2777;
+}
+
+.group-hover-emerald:hover,
+.feature-card:hover .group-hover-emerald {
+  color: #059669;
+}
+
+.card-text {
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* CTA Box */
+.cta-box {
+  position: relative;
+  background: #0f172a;
+  border-radius: 24px;
+  padding: 80px 24px;
+  overflow: hidden;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.cta-content {
+  position: relative;
+  z-index: 10;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.cta-title {
+  font-size: 2.5rem;
+  color: white;
+  margin-bottom: 32px;
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .cta-title {
+    font-size: 3.5rem;
+  }
+}
+
+.cta-note {
+  margin-top: 24px;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+/* Blobs */
+.blob {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+}
+
+.blob-1 {
+  top: -100px;
+  left: -100px;
+  background: #6366f1;
+}
+
+.blob-2 {
+  top: -100px;
+  right: -100px;
+  background: #a855f7;
+}
+
+/* Animation Keyframes (Ensure they exist) */
+@keyframes blob {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* =========================================
    4. UTILITIES (Replacing Tailwind)
    ========================================= */
 
