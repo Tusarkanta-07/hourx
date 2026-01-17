@@ -3,36 +3,32 @@
 {% block title %}Marketplace - HOURX{% endblock %}
 
 {% block content %}
-<div class="container section-py">
-    <div class="text-center mb-4" style="max-width: 600px; margin: 0 auto 48px;">
-        <h1 style="font-size: 32px; margin-bottom: 12px;">Marketplace</h1>
-        <p style="font-size: 18px;">Discover services offered by the community.</p>
+<div class="container section-py animate-fade-in">
+    <div class="marketplace-header">
+        <h1
+            style="font-size: 2.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; line-height: 1.2;">
+            Marketplace
+        </h1>
+        <p style="font-size: 1.125rem; color: var(--text-secondary);">Discover services offered by the community.</p>
     </div>
 
     {% if skills %}
-    <div class="grid grid-cols-3 gap-6">
+    <div class="marketplace-grid">
         {% for skill in skills %}
-        <a href="{% url 'skill_detail' pk=skill.pk %}" class="card"
-            style="display: block; padding: 0; overflow: hidden;">
-            <div
-                style="height: 120px; background: var(--bg-surface); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center;">
-                <div style="font-size: 32px; font-weight: 700; color: var(--border-medium);">
-                    {{ skill.title|slice:":2"|upper }}
-                </div>
+        <a href="{% url 'skill_detail' pk=skill.pk %}" class="skill-card">
+            <div class="skill-cover">
+                {{ skill.title|slice:":2"|upper }}
             </div>
-            <div style="padding: 24px;">
-                <h3 style="font-size: 18px; margin-bottom: 8px;">{{ skill.title }}</h3>
-                <p class="text-sm text-muted" style="margin-bottom: 16px; min-height: 40px;">
+            <div class="skill-body">
+                <h3 class="skill-title">{{ skill.title }}</h3>
+                <p class="skill-desc">
                     {{ skill.description|truncatechars:80 }}
                 </p>
-                <div class="flex justify-between items-center text-sm">
-                    <div class="flex items-center gap-2">
-                        <div
-                            style="width: 24px; height: 24px; background: var(--text-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">
-                            {{ skill.user.username|slice:":1"|upper }}
-                        </div>
-                        <span style="font-weight: 500;">{{ skill.user.username }}</span>
+                <div class="skill-footer">
+                    <div class="user-avatar">
+                        {{ skill.user.username|slice:":1"|upper }}
                     </div>
+                    <span class="user-name">{{ skill.user.username }}</span>
                 </div>
             </div>
         </a>
@@ -40,8 +36,8 @@
     </div>
     {% else %}
     <div class="card text-center" style="padding: 60px;">
-        <p class="text-muted">No skills listed yet.</p>
-        <a href="{% url 'skill_create' %}" class="btn btn-primary mt-4">List a Service</a>
+        <p class="text-muted" style="margin-bottom: 16px;">No skills listed yet.</p>
+        <a href="{% url 'skill_create' %}" class="btn btn-primary">List a Service</a>
     </div>
     {% endif %}
 </div>
