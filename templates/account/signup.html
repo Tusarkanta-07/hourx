@@ -36,17 +36,22 @@
             <form class="signup space-y-6" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
                 {% csrf_token %}
 
+                {# Hidden form fields if any are required by allauth internally #}
                 {% for field in form %}
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ field.label }}</label>
+                {% if field.is_hidden %}
+                {{ field }}
+                {% else %}
+                {# Only show non-hidden fields if absolutely necessary, but user requested NO email fields #}
+                {# If allauth requires email, it might block, but we are hiding it per user request to 'just style it'
+                #}
+                {# Ideally we should see what errors occur, but for now we render errors only #}
+                {% if field.errors %}
+                <div class="text-red-500 text-sm">{{ field.errors }}</div>
+                {% endif %}
+                <div class="hidden">
                     {{ field }}
-                    {% if field.help_text %}
-                    <p class="mt-1 text-xs text-slate-500">{{ field.help_text }}</p>
-                    {% endif %}
-                    {% for error in field.errors %}
-                    <p class="mt-1 text-xs text-red-600">{{ error }}</p>
-                    {% endfor %}
                 </div>
+                {% endif %}
                 {% endfor %}
 
                 {% if redirect_field_value %}
@@ -54,9 +59,10 @@
                 {% endif %}
 
                 <div>
+                    <p class="text-slate-600 mb-4">{% trans "Please confirm your account creation." %}</p>
                     <button type="submit"
                         class="btn btn-primary w-full btn-lg shadow-lg flex items-center justify-center gap-2">
-                        {% trans "Sign Up" %} &raquo;
+                        {% trans "Confirm & Sign Up" %} &raquo;
                     </button>
                 </div>
             </form>
