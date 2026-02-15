@@ -1,38 +1,44 @@
 {% extends "base.html" %}
+{% load socialaccount %}
 
-{% block title %}HOURX - The Future of Fair Exchange{% endblock %}
+{% block title %}HOURX - Time Banking Reimagined{% endblock %}
 
 {% block content %}
 <div class="space-y-24 py-10 lg:py-20 overflow-hidden">
 
     <!-- Hero Section -->
-    <!-- Hero Section -->
-    <div class="container hero-section relative z-10 text-center">
-        <!-- Floating badge -->
-        <div class="badge-pill animate-fade-in">
-            <span class="dot"></span>
-            The #1 Time Banking Protocol
+    <section class="hero-section">
+        <div class="ambient-bg">
+            <div class="ambient-orb orb-1"></div>
+            <div class="ambient-orb orb-2"></div>
         </div>
 
-        <h1 class="hero-title animate-fade-in delay-100">
-            Exchange Time.<br>
-            <span class="text-gradient">Master Life.</span>
-        </h1>
+        <div class="container text-center relative z-10">
+            <div class="badge-pill animate-fade-in">
+                <span class="dot"></span>
+                <span>The Future of Skill Exchange</span>
+            </div>
 
-        <p class="hero-subtitle animate-fade-in delay-200">
-            A revolutionary marketplace where money doesn't exist.
-            Trade your hours for skills, services, and freedom 1-to-1.
-        </p>
+            <h1 class="hero-title animate-fade-in delay-100">
+                Turn Your <span class="text-gradient">Time & Skills</span><br>
+                Into Real Value
+            </h1>
 
-        <div class="hero-actions animate-fade-in delay-300">
-            <a href="{% url 'register' %}" class="btn btn-primary btn-lg btn-glow">
-                Start Trading Free <i class="fa-solid fa-arrow-right ml-2"></i>
-            </a>
-            <a href="{% url 'skill_list' %}" class="btn btn-outline btn-lg">
-                <i class="fa-solid fa-magnifying-glass mr-2"></i> Explore Skills
-            </a>
+            <p class="hero-subtitle animate-fade-in delay-200">
+                Join the decentralized time banking revolution. Trade services directly,
+                earn Hour Credits, and build your reputation in a community-driven economy.
+            </p>
+
+            <div class="hero-actions animate-fade-in delay-300">
+                <a href="{% provider_login_url 'gitlab' %}" class="btn btn-primary btn-lg btn-glow">
+                    Start Trading Now <i class="fa-solid fa-arrow-right ml-2"></i>
+                </a>
+                <a href="{% url 'skill_list' %}" class="btn btn-outline btn-lg">
+                    Browse Marketplace
+                </a>
+            </div>
         </div>
-    </div>
+    </section>
 
     <!-- Stats / Trust -->
     <div class="container animate-on-scroll">
@@ -108,12 +114,10 @@
             </div>
 
             <div class="cta-content">
-                <h2 class="cta-title animate-float">
-                    Your time is valuable.<br>Start treating it that way.
-                </h2>
-                <div class="flex justify-center">
-                    <a href="{% url 'register' %}" class="btn btn-primary btn-lg btn-glow">
-                        Join the Movement
+                <h2 class="cta-title">Ready to Join the Economy?</h2>
+                <div class="hero-actions justify-center">
+                    <a href="{% provider_login_url 'gitlab' %}" class="btn btn-primary btn-lg btn-glow">
+                        Create Free Account
                     </a>
                 </div>
                 <p class="cta-note">No credit card required. Cancel anytime.</p>

@@ -1,3 +1,4 @@
+{% load socialaccount %}
 <nav class="navbar">
     <div class="container flex justify-between items-center w-full">
         <!-- Brand -->
@@ -22,14 +23,14 @@
                 <i class="fa-regular fa-clock"></i>
                 <span>{{ user.time_balance }}h</span>
             </div>
-            <form action="{% url 'logout' %}" method="post" style="display: inline;">
+            <form action="{% url 'account_logout' %}" method="post" style="display: inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline" style="padding: 6px 12px; font-size: 13px;">Sign
                     Out</button>
             </form>
             {% else %}
-            <a href="{% url 'login' %}" class="nav-link">Log In</a>
-            <a href="{% url 'register' %}" class="btn btn-primary">Get Started</a>
+            <a href="{% provider_login_url 'gitlab' %}" class="nav-link">Log In</a>
+            <a href="{% provider_login_url 'gitlab' %}" class="btn btn-primary">Get Started</a>
             {% endif %}
         </div>
     </div>

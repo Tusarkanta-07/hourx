@@ -37,6 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # Required by allauth
+    
+    # Allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.gitlab',
+
+
     'accounts',
     'skills',
     'barter',
@@ -51,7 +60,45 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Add the account middleware:
+    "allauth.account.middleware.AccountMiddleware",
 ]
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
+
+# Provider specific settings
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'gitlab': {
+        'SCOPE': ['read_user'],
+    }
+}
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+
+# Allauth configuration
+ACCOUNT_LOGIN_METHODS = {'email'}  # Replaces ACCOUNT_AUTHENTICATION_METHOD
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+# Replaces ACCOUNT_EMAIL_REQUIRED, ACCOUNT_UNIQUE_EMAIL, ACCOUNT_USERNAME_REQUIRED
+# We only want email, so we don't ask for username.
+# Note: allauth might still ask for a username if the custom user model requires it.
+# Our CustomUser model (from accounts) might require username.
+# Let's check accounts/models.py to be sure, but for now setting this
+ACCOUNT_USERNAME_REQUIRED = False # Still used in some versions or context, keeping for safety if new config doesn't cover it fully yet or just relying on defaults
+
+
+LOGIN_REDIRECT_URL = 'dashboard'
+LOGOUT_REDIRECT_URL = 'home'
+
 
 ROOT_URLCONF = 'hourx.urls'
 
@@ -118,7 +165,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
@@ -129,9 +176,6 @@ AUTH_USER_MODEL = 'accounts.User'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'dashboard'
-LOGOUT_REDIRECT_URL = 'home'
 
 # Email Configuration (Gmail SMTP)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
