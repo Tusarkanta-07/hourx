@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Connecting - HOURX{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[50vh]">
+    <div class="text-center animate-fade-in" style="background: var(--bg-card); padding: 3rem; border-radius: 12px; border: 1px solid var(--glass-border); max-width: 400px; margin: 0 auto; box-shadow: 0 8px 32px rgba(0,0,0,0.2);">
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4" style="color: var(--primary);"></i>
+        <h2 class="text-2xl font-semibold mb-2" style="color: white;">Connecting...</h2>
+        <p class="text-slate-400">Please wait while we securely connect your account.</p>
+        
+        <p class="mt-6 text-sm text-slate-500">
+            If you are not redirected automatically, <br>
+            <a href="{{ redirect_to }}" style="color: var(--primary); text-decoration: none;" class="hover:underline">click here to continue</a>.
+        </p>
+    </div>
+</div>
+
+<script>
+    // Automatically redirect after a very brief delay to allow CSS to display
+    setTimeout(function() {
+        window.location.href = "{{ redirect_to|escapejs }}";
+    }, 100);
+</script>
+{% endblock %}
