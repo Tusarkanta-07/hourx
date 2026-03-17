@@ -95,7 +95,7 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 # Let's check accounts/models.py to be sure, but for now setting this
 ACCOUNT_USERNAME_REQUIRED = False # Still used in some versions or context, keeping for safety if new config doesn't cover it fully yet or just relying on defaults
 
-ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'home'
