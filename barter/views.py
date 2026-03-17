@@ -70,3 +70,28 @@ def complete_request(request, request_id):
     except Exception as e:
         messages.error(request, str(e))
     return redirect('sent_requests')
+
+@login_required
+def join_meeting(request, request_id):
+    # Ensure only sender or receiver of the accepted request can join
+    barter_req = get_object_or_404(BarterRequest, id=request_id)
+    
+    if request.user != barter_req.sender and request.user != barter_req.receiver:
+        messages.error(request, "You do not have permission to join this meeting.")
+        return redirect('skill_list')
+
+    if barter_req.status not in ['ACCEPTED', 'COMPLETED']:
+        messages.error(request, "Meeting is only available for accepted or completed requests.")
+        return redirect('skill_list')
+
+    # Generate a unique and private meeting room name
+    # Using the request ID and the skill title stripped of non-alphanumeric characters
+    import re
+    clean_title = re.sub(r'\W+', '', barter_req.skill.title)
+    meeting_room_name = f"HOURX_Meeting_{request_id}_{clean_title}_SecureRoom"
+
+    return render(request, 'barter/meeting.html', {
+        'request_obj': barter_req,
+        'meeting_room_name': meeting_room_name
+    })
+

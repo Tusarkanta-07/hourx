@@ -49,18 +49,24 @@
                     </div>
                 </div>
 
-                <div class="flex-shrink-0 pt-1">
+                <div class="flex-shrink-0 pt-1 flex flex-col gap-2">
                     {% if req.status == 'ACCEPTED' %}
+                    <a href="{% url 'join_meeting' req.pk %}" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-0">
+                        <i class="fa-solid fa-video mr-1"></i>Join Meeting
+                    </a>
                     <form action="{% url 'complete_request' req.pk %}" method="post"
                         onsubmit="return confirm('Confirm completion? This will release funds to {{ req.receiver.username }}.');">
                         {% csrf_token %}
                         <button type="submit"
-                            class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0">
+                            class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0 w-full">
                             <i class="fa-solid fa-check mr-1"></i>Mark Complete
                         </button>
                     </form>
                     {% elif req.status == 'COMPLETED' %}
-                    <a href="{% url 'add_review' user_id=req.receiver.pk %}" class="btn btn-secondary btn-sm">
+                    <a href="{% url 'join_meeting' req.pk %}" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-0">
+                        <i class="fa-solid fa-video mr-1"></i>Join Meeting
+                    </a>
+                    <a href="{% url 'add_review' user_id=req.receiver.pk %}" class="btn btn-secondary btn-sm w-full">
                         <i class="fa-regular fa-star mr-1"></i> Leave Review
                     </a>
                     {% endif %}
