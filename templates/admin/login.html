@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login – HourX{% endblock %}
+
+{% block content %}
+<div style="min-height:70vh; display:flex; align-items:center; justify-content:center; padding:24px;">
+    <div class="card card-glow" style="max-width:440px; width:100%; padding:48px 40px;">
+        <div class="card-orb card-orb-purple"></div>
+        <div class="text-center" style="margin-bottom:32px; position:relative; z-index:1;">
+            <div class="stat-icon" style="background:rgba(251,113,133,0.1); border:1px solid rgba(251,113,133,0.15); margin: 0 auto 24px; width:64px; height:64px;">
+                <span class="material-symbols-outlined" style="color:var(--accent-rose); font-size:32px;">admin_panel_settings</span>
+            </div>
+            <div class="text-h2 mb-8">Admin Access</div>
+            <p class="text-body text-small">Restricted portal for system administrators.</p>
+        </div>
+
+        <div style="position:relative; z-index:1;">
+            {% if form.errors and not form.non_field_errors %}
+            <div class="mb-24 p-16" style="background:rgba(251,113,133,0.1); border:1px solid rgba(251,113,133,0.2); border-radius:var(--radius-md);">
+                <p class="text-small" style="color:var(--accent-rose);">Please correct the error below.</p>
+            </div>
+            {% endif %}
+            
+            {% if form.non_field_errors %}
+            <div class="mb-24 p-16" style="background:rgba(251,113,133,0.1); border:1px solid rgba(251,113,133,0.2); border-radius:var(--radius-md);">
+                {% for error in form.non_field_errors %}
+                <p class="text-small" style="color:var(--accent-rose);">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if user.is_authenticated %}
+            <div class="mb-24 p-16" style="background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.2); border-radius:var(--radius-md);">
+                <p class="text-small" style="color:var(--accent-amber);">You are authenticated as <strong>{{ user.username }}</strong>, but are not authorized to access this page. Would you like to login to a different account?</p>
+            </div>
+            {% endif %}
+
+            <form action="{{ app_path }}" method="post" id="login-form">
+                {% csrf_token %}
+                
+                <div class="form-group mb-20">
+                    <label class="form-label" for="id_username">Username</label>
+                    <input type="text" name="username" class="form-input" id="id_username" required autofocus>
+                    {% if form.username.errors %}
+                    <div class="text-xs mt-4" style="color:var(--accent-rose);">{{ form.username.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group mb-24">
+                    <label class="form-label" for="id_password">Password</label>
+                    <input type="password" name="password" class="form-input" id="id_password" required>
+                    {% if form.password.errors %}
+                    <div class="text-xs mt-4" style="color:var(--accent-rose);">{{ form.password.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    <span class="material-symbols-outlined">login</span> Authenticate
+                </button>
+                
+                <input type="hidden" name="next" value="{{ next|default:'' }}">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

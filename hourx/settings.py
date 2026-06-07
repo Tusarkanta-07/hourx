@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@bdkwjd*(@*uyx)=t@ondww^9w$1vvcuur$0hux+jlji9!_+n@'
+# Load from environment for production; fallback kept for local development only.
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-@bdkwjd*(@*uyx)=t@ondww^9w$1vvcuur$0hux+jlji9!_+n@'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = ['*']
+# Allowed hosts can be set via `DJANGO_ALLOWED_HOSTS` (comma-separated).
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -43,8 +49,10 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.gitlab',
-
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.discord',
+    'allauth.socialaccount.providers.linkedin_oauth2',
 
     'accounts',
     'skills',
@@ -74,26 +82,70 @@ AUTHENTICATION_BACKENDS = [
 
 SITE_ID = 1
 
-# Provider specific settings
-# Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {
-    'gitlab': {
-        'SCOPE': ['read_user'],
+    'google': {
+        'APP': {
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID', 'placeholder-google-client-id'),
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET', 'placeholder-google-client-secret'),
+            'key': ''
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    },
+    'github': {
+        'APP': {
+            'client_id': os.environ.get('GITHUB_CLIENT_ID', 'placeholder-github-client-id'),
+            'secret': os.environ.get('GITHUB_CLIENT_SECRET', 'placeholder-github-client-secret'),
+            'key': ''
+        },
+        'SCOPE': [
+            'user',
+            'read:user',
+            'user:email',
+        ],
+    },
+    'discord': {
+        'APP': {
+            'client_id': os.environ.get('DISCORD_CLIENT_ID', 'placeholder-discord-client-id'),
+            'secret': os.environ.get('DISCORD_CLIENT_SECRET', 'placeholder-discord-client-secret'),
+            'key': ''
+        },
+        'SCOPE': [
+            'identify',
+            'email',
+        ],
+    },
+    'linkedin_oauth2': {
+        'APP': {
+            'client_id': os.environ.get('LINKEDIN_CLIENT_ID', 'placeholder-linkedin-client-id'),
+            'secret': os.environ.get('LINKEDIN_CLIENT_SECRET', 'placeholder-linkedin-client-secret'),
+            'key': ''
+        },
+        'SCOPE': [
+            'openid',
+            'profile',
+            'email',
+        ],
+        'PROFILE_FIELDS': [
+            'id',
+            'first-name',
+            'last-name',
+            'email-address',
+            'picture-url',
+        ],
     }
 }
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
 
 # Allauth configuration
-ACCOUNT_LOGIN_METHODS = {'email'}  # Replaces ACCOUNT_AUTHENTICATION_METHOD
+ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-
-# Replaces ACCOUNT_EMAIL_REQUIRED, ACCOUNT_UNIQUE_EMAIL, ACCOUNT_USERNAME_REQUIRED
-# We only want email, so we don't ask for username.
-# Note: allauth might still ask for a username if the custom user model requires it.
-# Our CustomUser model (from accounts) might require username.
-# Let's check accounts/models.py to be sure, but for now setting this
-ACCOUNT_USERNAME_REQUIRED = False # Still used in some versions or context, keeping for safety if new config doesn't cover it fully yet or just relying on defaults
 
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
@@ -181,6 +233,18 @@ AUTH_USER_MODEL = 'accounts.User'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Basic production security settings applied when DEBUG is False
+if not DEBUG:
+    SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT', 'True').lower() in ('1', 'true', 'yes')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', 3600))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+
 
 # Email Configuration (Gmail SMTP)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -188,6 +252,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 # stored in environment variables for security, or replace with your actual values temporarily
-import os
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'your-email@gmail.com')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'your-app-password')

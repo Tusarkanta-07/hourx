@@ -1,5 +1,56 @@
-<footer class="footer text-center">
-    <div class="container">
-        <p>&copy; 2026 HOURX. Time is Money.</p>
+{% load socialaccount %}
+<footer class="footer">
+    <div class="footer-inner" style="flex-direction:column; gap:40px;">
+        <!-- Top row -->
+        <div class="w-full flex justify-between items-start" style="flex-wrap:wrap; gap:40px;">
+            <div style="max-width:320px;">
+                <div class="footer-brand text-gradient" style="font-size:28px;">HourX</div>
+                <p class="text-body mt-12">The premium time-exchange economy. Trade your skills, grow your network, and build a verifiable reputation — all without spending a dime.</p>
+                <div class="flex gap-12 mt-16">
+                    <a href="#" class="avatar avatar-sm" style="width:36px; height:36px; font-size:14px; text-decoration:none;" title="Twitter">𝕏</a>
+                    <a href="#" class="avatar avatar-sm" style="width:36px; height:36px; font-size:14px; text-decoration:none;" title="GitHub">GH</a>
+                    <a href="#" class="avatar avatar-sm" style="width:36px; height:36px; font-size:14px; text-decoration:none;" title="Discord">DC</a>
+                </div>
+            </div>
+            <div class="flex gap-40" style="flex-wrap:wrap;">
+                <div>
+                    <div class="text-label mb-16">Platform</div>
+                    <div class="flex flex-col gap-12">
+                        <a href="{% url 'skill_list' %}" class="footer-link">Marketplace</a>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="footer-link">Dashboard</a>
+                        <a href="{% url 'profile' %}" class="footer-link">Profile</a>
+                        {% else %}
+                        <a href="{% url 'home' %}" class="footer-link">Home</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div>
+                    <div class="text-label mb-16">Legal</div>
+                    <div class="flex flex-col gap-12">
+                        <a href="{% url 'terms' %}" class="footer-link">Terms of Service</a>
+                        <a href="{% url 'privacy' %}" class="footer-link">Privacy Policy</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-label mb-16">Resources</div>
+                    <div class="flex flex-col gap-12">
+                        <a href="{% url 'support' %}" class="footer-link">Contact Support</a>
+                        <a href="{% url 'guidelines' %}" class="footer-link">Community Guidelines</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Divider -->
+        <div class="divider"></div>
+        <!-- Bottom row -->
+        <div class="w-full flex justify-between items-center" style="flex-wrap:wrap; gap:16px;">
+            <p class="footer-copy">&copy; 2026 HourX. The currency of the future is time.</p>
+            <div class="flex gap-20">
+                <a href="{% url 'terms' %}" class="footer-link">Terms</a>
+                <a href="{% url 'privacy' %}" class="footer-link">Privacy</a>
+                <a href="{% url 'support' %}" class="footer-link">Support</a>
+            </div>
+        </div>
     </div>
 </footer>

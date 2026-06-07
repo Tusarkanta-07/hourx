@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of Service – HourX{% endblock %}
+
+{% block content %}
+<div class="container-md" style="padding-bottom:80px;">
+    <div class="text-center mb-32" style="padding-top:20px;">
+        <span class="badge badge-accepted" style="padding:6px 16px; font-size:12px; margin-bottom:16px;">
+            <span class="material-symbols-outlined" style="font-size:14px;">gavel</span> Legal
+        </span>
+        <h1 class="text-h1 mb-12">Terms of Service</h1>
+        <p class="text-body">Last updated: May 1, 2026</p>
+    </div>
+
+    <div class="flex flex-col gap-32">
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(212,132,90,0.06); border:1px solid rgba(212,132,90,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-copper);">description</span></div>
+                <h2 class="text-h3">1. Acceptance of Terms</h2>
+            </div>
+            <p class="text-body">By accessing and using HourX ("the Platform"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to all of these Terms, you may not access or use the Platform. These Terms constitute a legally binding agreement between you and HourX.</p>
+            <p class="text-body mt-16">We reserve the right to modify these Terms at any time. Continued use of the Platform after any such changes shall constitute your consent to such changes. It is your responsibility to review these Terms periodically for updates.</p>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(201,169,110,0.06); border:1px solid rgba(201,169,110,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-gold);">person</span></div>
+                <h2 class="text-h3">2. User Accounts</h2>
+            </div>
+            <p class="text-body">To access most features of the Platform, you must create an account through our supported authentication providers (currently GitLab OAuth). You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
+            <p class="text-body mt-16">You agree to provide accurate, current, and complete information during the registration process. You must be at least 18 years old to create an account. Each user is permitted to maintain only one active account on the Platform.</p>
+            <p class="text-body mt-16">Upon registration, you will receive an initial credit balance of <strong style="color:var(--accent-copper);">5.00 hours</strong>. These credits are non-transferable outside the Platform and hold no monetary value.</p>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-purple);">schedule</span></div>
+                <h2 class="text-h3">3. Time Credits & Escrow System</h2>
+            </div>
+            <p class="text-body">HourX operates on a time-based credit system where 1 credit equals 1 hour of service. When you send a barter request, the specified hours are deducted from your balance and held in escrow.</p>
+            <div class="mt-16 p-24" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);">
+                <div class="text-label mb-12" style="color:var(--accent-copper);">How Escrow Works</div>
+                <div class="flex flex-col gap-12">
+                    <div class="flex items-start gap-12"><span class="badge badge-pending" style="min-width:28px; justify-content:center;">1</span><p class="text-body"><strong>Request Sent</strong> — Hours are reserved from your balance when you send a request.</p></div>
+                    <div class="flex items-start gap-12"><span class="badge badge-accepted" style="min-width:28px; justify-content:center;">2</span><p class="text-body"><strong>Request Accepted</strong> — Hours are locked in escrow. Neither party can access them.</p></div>
+                    <div class="flex items-start gap-12"><span class="badge badge-completed" style="min-width:28px; justify-content:center;">3</span><p class="text-body"><strong>Completed</strong> — Hours are released to the service provider's balance.</p></div>
+                </div>
+            </div>
+            <p class="text-body mt-16">If a request is rejected or canceled before acceptance, hours are immediately returned. If canceled after acceptance (escrow), hours are returned to the sender.</p>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-amber);">workspace_premium</span></div>
+                <h2 class="text-h3">4. Skill Listings & Conduct</h2>
+            </div>
+            <p class="text-body">You may list skills and services on the marketplace. All listings must accurately represent the service offered. You are prohibited from listing illegal services, fraudulent offerings, or any content that violates applicable laws.</p>
+            <p class="text-body mt-16">Users must conduct all exchanges in good faith. Failure to deliver a service after accepting a request and receiving escrowed hours may result in account suspension or termination.</p>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(251,113,133,0.08); border:1px solid rgba(251,113,133,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-rose);">block</span></div>
+                <h2 class="text-h3">5. Prohibited Activities</h2>
+            </div>
+            <div class="grid grid-2 mt-16" style="gap:16px;">
+                <div class="p-16" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);"><span class="material-symbols-outlined mb-8" style="color:var(--accent-rose); font-size:20px;">close</span><p class="text-small">Creating multiple accounts to exploit the initial credits system</p></div>
+                <div class="p-16" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);"><span class="material-symbols-outlined mb-8" style="color:var(--accent-rose); font-size:20px;">close</span><p class="text-small">Harassment, abuse, or threats against other users</p></div>
+                <div class="p-16" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);"><span class="material-symbols-outlined mb-8" style="color:var(--accent-rose); font-size:20px;">close</span><p class="text-small">Listing fraudulent, misleading, or illegal services</p></div>
+                <div class="p-16" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);"><span class="material-symbols-outlined mb-8" style="color:var(--accent-rose); font-size:20px;">close</span><p class="text-small">Attempting to circumvent the escrow system</p></div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(212,132,90,0.06); border:1px solid rgba(212,132,90,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-copper);">shield</span></div>
+                <h2 class="text-h3">6. Limitation of Liability</h2>
+            </div>
+            <p class="text-body">HourX is provided on an "as is" and "as available" basis. We make no warranties, expressed or implied, regarding the Platform's reliability, availability, or fitness for a particular purpose.</p>
+            <p class="text-body mt-16">HourX shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Platform, including but not limited to loss of data, profits, or goodwill.</p>
+            <p class="text-body mt-16">We do not guarantee the quality of services exchanged between users. All exchanges are conducted at the users' own risk.</p>
+        </section>
+
+        <section class="card text-center" style="background:linear-gradient(135deg, rgba(212,132,90,0.04), rgba(201,169,110,0.03)); border-color:rgba(212,132,90,0.1);">
+            <h3 class="text-h3 mb-8">Questions about these terms?</h3>
+            <p class="text-body mb-24">Our support team is happy to help clarify anything.</p>
+            <a href="{% url 'support' %}" class="btn btn-primary"><span class="material-symbols-outlined">mail</span> Contact Support</a>
+        </section>
+    </div>
+</div>
+{% endblock %}

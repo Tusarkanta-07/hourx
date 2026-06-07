@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy – HourX{% endblock %}
+
+{% block content %}
+<div class="container-md" style="padding-bottom:80px;">
+    <div class="text-center mb-32" style="padding-top:20px;">
+        <span class="badge badge-completed" style="padding:6px 16px; font-size:12px; margin-bottom:16px;">
+            <span class="material-symbols-outlined" style="font-size:14px;">lock</span> Privacy
+        </span>
+        <h1 class="text-h1 mb-12">Privacy Policy</h1>
+        <p class="text-body">Last updated: May 1, 2026</p>
+    </div>
+
+    <div class="flex flex-col gap-32">
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(212,132,90,0.06); border:1px solid rgba(212,132,90,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-copper);">visibility</span></div>
+                <h2 class="text-h3">1. Information We Collect</h2>
+            </div>
+            <p class="text-body">When you sign up using GitLab OAuth, we receive and store the following information from your GitLab profile:</p>
+            <div class="grid grid-3 mt-16" style="gap:12px;">
+                <div class="p-16" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);">
+                    <span class="material-symbols-outlined mb-8" style="color:var(--accent-copper);">person</span>
+                    <div class="font-semibold text-small mb-4">Profile Info</div>
+                    <p class="text-xs">Username, display name, email address, and profile avatar</p>
+                </div>
+                <div class="p-16" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);">
+                    <span class="material-symbols-outlined mb-8" style="color:var(--accent-gold);">edit_note</span>
+                    <div class="font-semibold text-small mb-4">User Content</div>
+                    <p class="text-xs">Bio, skill listings, exchange messages, and reviews you create</p>
+                </div>
+                <div class="p-16" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);">
+                    <span class="material-symbols-outlined mb-8" style="color:var(--accent-purple);">analytics</span>
+                    <div class="font-semibold text-small mb-4">Activity Data</div>
+                    <p class="text-xs">Barter requests, transaction history, login timestamps, and time balance</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(201,169,110,0.06); border:1px solid rgba(201,169,110,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-gold);">settings</span></div>
+                <h2 class="text-h3">2. How We Use Your Information</h2>
+            </div>
+            <p class="text-body mb-16">We use the collected information for the following purposes:</p>
+            <div class="flex flex-col gap-12">
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-copper); margin-top:2px;">check_circle</span><p class="text-body"><strong>Account Management</strong> — To create, authenticate, and manage your HourX account.</p></div>
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-copper); margin-top:2px;">check_circle</span><p class="text-body"><strong>Service Delivery</strong> — To facilitate skill exchanges, manage barter requests, and operate the escrow system.</p></div>
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-copper); margin-top:2px;">check_circle</span><p class="text-body"><strong>Communication</strong> — To send important updates about your exchanges, account status, and Platform changes.</p></div>
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-copper); margin-top:2px;">check_circle</span><p class="text-body"><strong>Safety & Security</strong> — To detect fraud, abuse, and enforce our Terms of Service and Community Guidelines.</p></div>
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-copper); margin-top:2px;">check_circle</span><p class="text-body"><strong>Platform Improvement</strong> — To analyze usage patterns and improve our features, design, and user experience.</p></div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-purple);">share</span></div>
+                <h2 class="text-h3">3. Information Sharing</h2>
+            </div>
+            <p class="text-body">We do <strong style="color:var(--accent-copper);">not</strong> sell your personal information. We may share limited data in these circumstances:</p>
+            <div class="flex flex-col gap-12 mt-16">
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-amber); margin-top:2px;">people</span><p class="text-body"><strong>Other Users</strong> — Your username, bio, skills, and reviews are visible to other Platform users.</p></div>
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-amber); margin-top:2px;">gavel</span><p class="text-body"><strong>Legal Requirements</strong> — If required by law, regulation, or valid legal process.</p></div>
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-amber); margin-top:2px;">security</span><p class="text-body"><strong>Safety</strong> — To protect the rights, property, and safety of HourX and its users.</p></div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-amber);">cookie</span></div>
+                <h2 class="text-h3">4. Cookies & Session Data</h2>
+            </div>
+            <p class="text-body">HourX uses essential cookies to maintain your login session and CSRF protection. We do not use advertising cookies or third-party tracking cookies.</p>
+            <div class="mt-16 p-24" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);">
+                <div class="grid grid-2" style="gap:24px;">
+                    <div><div class="font-semibold text-small mb-4" style="color:var(--accent-copper);">Session Cookie</div><p class="text-xs">Keeps you logged in across pages. Expires when you close your browser or log out.</p></div>
+                    <div><div class="font-semibold text-small mb-4" style="color:var(--accent-gold);">CSRF Token</div><p class="text-xs">Protects form submissions from cross-site request forgery attacks. Essential for security.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(212,132,90,0.06); border:1px solid rgba(212,132,90,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-copper);">tune</span></div>
+                <h2 class="text-h3">5. Your Rights & Data Control</h2>
+            </div>
+            <p class="text-body">You have the right to access, update, or delete your personal information at any time through your Profile page. You can update your name, email, bio, and profile picture directly.</p>
+            <p class="text-body mt-16">To request a full data export or account deletion, please contact our support team. We will process your request within 30 days.</p>
+        </section>
+
+        <section class="card text-center" style="background:linear-gradient(135deg, rgba(212,132,90,0.04), rgba(201,169,110,0.03)); border-color:rgba(212,132,90,0.1);">
+            <h3 class="text-h3 mb-8">Have privacy concerns?</h3>
+            <p class="text-body mb-24">We take your privacy seriously. Reach out anytime.</p>
+            <a href="{% url 'support' %}" class="btn btn-primary"><span class="material-symbols-outlined">mail</span> Contact Support</a>
+        </section>
+    </div>
+</div>
+{% endblock %}

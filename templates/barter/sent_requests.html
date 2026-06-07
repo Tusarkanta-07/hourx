@@ -1,74 +1,48 @@
 {% extends "base.html" %}
 
-{% block title %}Sent Requests - HOURX{% endblock %}
+{% block title %}Sent Requests – HourX{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto animate-fade-in">
-    <h2 class="text-2xl font-bold font-heading mb-6">Sent Requests</h2>
+<div class="container-md">
+    <h1 class="text-h1 mb-32">Sent Requests</h1>
 
     {% if requests %}
-    <div class="space-y-4">
+    <div class="flex flex-col gap-16">
         {% for req in requests %}
-        <div class="card p-6 hover-card">
-            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
-                <div class="flex-grow">
-                    <div class="flex items-center gap-2 mb-1">
-                        <h3 class="font-bold text-lg">{{ req.skill.title }}</h3>
+        <div class="request-card">
+            <div class="flex justify-between items-start gap-20" style="flex-wrap:wrap;">
+                <div class="flex-1" style="min-width:0;">
+                    <div class="flex items-center gap-8 mb-8">
+                        <h3 class="text-h4">{{ req.skill.title }}</h3>
                         {% if req.is_escrowed %}
-                        <span
-                            class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary border border-primary/20"
-                            title="Funds Locked">
-                            <i class="fa-solid fa-lock mr-1"></i>Escrow
+                        <span class="badge badge-escrow">
+                            <span class="material-symbols-outlined" style="font-size:12px;">lock</span> Escrow
                         </span>
                         {% endif %}
                     </div>
-
-                    <div class="flex items-center gap-4 text-sm text-muted mb-3">
-                        <span class="flex items-center gap-1">
-                            <i class="fa-regular fa-user"></i> To: <span class="font-medium text-white">{{
-                                req.receiver.username }}</span>
+                    <div class="flex items-center gap-16 text-small mb-12" style="flex-wrap:wrap;">
+                        <span class="flex items-center gap-4">
+                            <span class="material-symbols-outlined" style="font-size:16px;">person</span>
+                            To: <strong>{{ req.receiver.username }}</strong>
                         </span>
-                        <span class="flex items-center gap-1">
-                            <i class="fa-regular fa-clock"></i> {{ req.hours }} hrs
+                        <span class="flex items-center gap-4">
+                            <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
+                            {{ req.hours }} hrs
                         </span>
-                        <span class="text-xs opacity-70">{{ req.created_at|date:"M d, Y" }}</span>
+                        <span class="text-xs">{{ req.created_at|date:"M d, Y" }}</span>
                     </div>
-
-                    <div
-                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide
-                            {% if req.status == 'PENDING' %}bg-amber-500/10 text-amber-500 border border-amber-500/20{% endif %}
-                            {% if req.status == 'ACCEPTED' %}bg-blue-500/10 text-blue-500 border border-blue-500/20{% endif %}
-                            {% if req.status == 'COMPLETED' %}bg-emerald-500/10 text-emerald-500 border border-emerald-500/20{% endif %}
-                            {% if req.status == 'REJECTED' %}bg-red-500/10 text-red-500 border border-red-500/20{% endif %}">
-                        <span class="w-1.5 h-1.5 rounded-full mr-2 
-                                {% if req.status == 'PENDING' %}bg-amber-500{% endif %}
-                                {% if req.status == 'ACCEPTED' %}bg-blue-500{% endif %}
-                                {% if req.status == 'COMPLETED' %}bg-emerald-500{% endif %}
-                                {% if req.status == 'REJECTED' %}bg-red-500{% endif %}"></span>
-                        {{ req.get_status_display }}
-                    </div>
+                    <span class="badge {% if req.status == 'PENDING' %}badge-pending{% elif req.status == 'ACCEPTED' %}badge-accepted{% elif req.status == 'COMPLETED' %}badge-completed{% elif req.status == 'REJECTED' %}badge-rejected{% else %}badge-canceled{% endif %}">{{ req.get_status_display }}</span>
                 </div>
-
-                <div class="flex-shrink-0 pt-1 flex flex-col gap-2">
-                    {% if req.status == 'ACCEPTED' %}
-                    <a href="{% url 'join_meeting' req.pk %}" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-0">
-                        <i class="fa-solid fa-video mr-1"></i>Join Meeting
-                    </a>
-                    <form action="{% url 'complete_request' req.pk %}" method="post"
-                        onsubmit="return confirm('Confirm completion? This will release funds to {{ req.receiver.username }}.');">
-                        {% csrf_token %}
-                        <button type="submit"
-                            class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0 w-full">
-                            <i class="fa-solid fa-check mr-1"></i>Mark Complete
-                        </button>
-                    </form>
+                <div class="flex flex-col gap-8 shrink-0" style="min-width:140px;">
+                    {% if req.status == 'PENDING' %}
+                    <form action="{% url 'cancel_request' req.pk %}" method="post" onsubmit="return confirm('Cancel this request?');">{% csrf_token %}<button type="submit" class="btn btn-danger btn-sm btn-block">Cancel</button></form>
+                    {% elif req.status == 'ACCEPTED' %}
+                    <a href="{% url 'join_meeting' req.pk %}" class="btn btn-primary btn-sm btn-block">Join Meeting</a>
+                    <form action="{% url 'complete_request' req.pk %}" method="post" onsubmit="return confirm('Confirm completion?');">{% csrf_token %}<button type="submit" class="btn btn-success btn-sm btn-block">Complete</button></form>
+                    <form action="{% url 'cancel_request' req.pk %}" method="post" onsubmit="return confirm('Cancel accepted request?');">{% csrf_token %}<button type="submit" class="btn btn-danger btn-sm btn-block">Cancel</button></form>
                     {% elif req.status == 'COMPLETED' %}
-                    <a href="{% url 'join_meeting' req.pk %}" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-0">
-                        <i class="fa-solid fa-video mr-1"></i>Join Meeting
-                    </a>
-                    <a href="{% url 'add_review' user_id=req.receiver.pk %}" class="btn btn-secondary btn-sm w-full">
-                        <i class="fa-regular fa-star mr-1"></i> Leave Review
-                    </a>
+                    <a href="{% url 'join_meeting' req.pk %}" class="btn btn-primary btn-sm btn-block">Meeting</a>
+                    <a href="{% url 'add_review' user_id=req.receiver.pk %}" class="btn btn-secondary btn-sm btn-block">Review</a>
                     {% endif %}
                 </div>
             </div>
@@ -76,12 +50,10 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="card text-center py-16 border-dashed">
-        <div class="w-16 h-16 bg-surface-light rounded-full flex items-center justify-center mx-auto mb-4 text-muted">
-            <i class="fa-regular fa-paper-plane text-2xl"></i>
-        </div>
-        <p class="text-muted mb-4">You haven't sent any requests yet.</p>
-        <a href="{% url 'skill_list' %}" class="text-primary font-semibold hover:underline">Browse Skills</a>
+    <div class="card empty-state">
+        <span class="material-symbols-outlined empty-icon">send</span>
+        <p class="text-body mb-16">You haven't sent any requests yet.</p>
+        <a href="{% url 'skill_list' %}" class="btn btn-secondary">Browse Skills</a>
     </div>
     {% endif %}
 </div>

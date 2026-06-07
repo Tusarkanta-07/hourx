@@ -1,37 +1,51 @@
 {% load socialaccount %}
-<nav class="navbar">
-    <div class="container flex justify-between items-center w-full">
-        <!-- Brand -->
-        <a href="{% url 'home' %}" class="nav-brand">HOURX</a>
+<nav class="navbar" id="main-navbar">
+    <div class="navbar-inner">
+        <a href="{% url 'home' %}" class="navbar-brand">HourX</a>
 
-        <!-- Links (Centered) -->
-        <div class="flex gap-6">
+        <div class="nav-links hide-mobile">
             {% if user.is_authenticated %}
             <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
             <a href="{% url 'skill_list' %}" class="nav-link">Marketplace</a>
             <a href="{% url 'profile' %}" class="nav-link">Profile</a>
             {% else %}
             <a href="{% url 'skill_list' %}" class="nav-link">Explore</a>
-            <a href="#how-it-works" class="nav-link">How it Works</a>
+            <a href="{% url 'home' %}#how-it-works" class="nav-link">How it Works</a>
             {% endif %}
         </div>
 
-        <!-- Auth Actions -->
         <div class="nav-actions">
             {% if user.is_authenticated %}
-            <div class="badge">
-                <i class="fa-regular fa-clock"></i>
+            <div class="balance-pill hide-mobile">
+                <span class="material-symbols-outlined">schedule</span>
                 <span>{{ user.time_balance }}h</span>
             </div>
-            <form action="{% url 'account_logout' %}" method="post" style="display: inline;">
+            <form action="{% url 'account_logout' %}" method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-outline" style="padding: 6px 12px; font-size: 13px;">Sign
-                    Out</button>
+                <button type="submit" class="btn btn-ghost btn-sm">Sign Out</button>
             </form>
             {% else %}
-            <a href="{% provider_login_url 'gitlab' %}" class="nav-link">Log In</a>
-            <a href="{% provider_login_url 'gitlab' %}" class="btn btn-primary">Get Started</a>
+            <a href="{% url 'account_login' %}" class="nav-link hide-mobile">Login</a>
+            <a href="{% url 'account_signup' %}" class="btn btn-primary btn-sm">Get Started</a>
             {% endif %}
+            <button class="nav-toggle" aria-label="Toggle menu">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
         </div>
+    </div>
+    <div class="mobile-menu">
+        {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+        <a href="{% url 'skill_list' %}" class="nav-link">Marketplace</a>
+        <a href="{% url 'profile' %}" class="nav-link">Profile</a>
+        <div class="balance-pill" style="margin-top:8px;">
+            <span class="material-symbols-outlined">schedule</span>
+            <span>{{ user.time_balance }}h</span>
+        </div>
+        {% else %}
+        <a href="{% url 'skill_list' %}" class="nav-link">Explore</a>
+        <a href="{% url 'home' %}#how-it-works" class="nav-link">How it Works</a>
+        <a href="{% url 'account_login' %}" class="nav-link">Login</a>
+        {% endif %}
     </div>
 </nav>

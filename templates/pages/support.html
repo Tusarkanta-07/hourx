@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Support – HourX{% endblock %}
+
+{% block content %}
+<div class="container-md" style="padding-bottom:80px;">
+    <div class="text-center mb-32" style="padding-top:20px;">
+        <span class="badge badge-escrow" style="padding:6px 16px; font-size:12px; margin-bottom:16px;">
+            <span class="material-symbols-outlined" style="font-size:14px;">support_agent</span> Help Center
+        </span>
+        <h1 class="text-h1 mb-12">How Can We Help?</h1>
+        <p class="text-body" style="max-width:500px; margin:0 auto;">Find answers to common questions or get in touch with our team.</p>
+    </div>
+
+    <div class="grid grid-3 mb-32">
+        <div class="card card-interactive card-glow text-center" style="padding:32px;">
+            <div class="card-orb card-orb-blue"></div>
+            <span class="material-symbols-outlined mb-12" style="font-size:36px; color:var(--accent-copper);">rocket_launch</span>
+            <h3 class="text-h4 mb-8">Getting Started</h3>
+            <p class="text-small">New to HourX? Learn the basics of trading time and setting up your profile.</p>
+        </div>
+        <div class="card card-interactive card-glow text-center" style="padding:32px;">
+            <div class="card-orb card-orb-teal"></div>
+            <span class="material-symbols-outlined mb-12" style="font-size:36px; color:var(--accent-gold);">sync_alt</span>
+            <h3 class="text-h4 mb-8">Trading & Escrow</h3>
+            <p class="text-small">Understand how barter requests, escrow, and time credits work.</p>
+        </div>
+        <div class="card card-interactive card-glow text-center" style="padding:32px;">
+            <div class="card-orb card-orb-purple"></div>
+            <span class="material-symbols-outlined mb-12" style="font-size:36px; color:var(--accent-purple);">shield</span>
+            <h3 class="text-h4 mb-8">Safety & Trust</h3>
+            <p class="text-small">Learn about our security measures and how to stay safe on the platform.</p>
+        </div>
+    </div>
+
+    <div class="mb-32">
+        <h2 class="text-h2 mb-24 text-center">Frequently Asked Questions</h2>
+        <div class="flex flex-col gap-16">
+            <div class="card">
+                <div class="flex items-start gap-16">
+                    <span class="material-symbols-outlined shrink-0" style="color:var(--accent-copper); margin-top:2px;">help</span>
+                    <div>
+                        <h3 class="text-h4 mb-8">How do I sign up for HourX?</h3>
+                        <p class="text-body">Click "Get Started" or "Sign in with GitLab" and authenticate using your GitLab account. Your HourX account will be created automatically with 5.00 hours of initial credits. No separate registration form is needed.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="flex items-start gap-16">
+                    <span class="material-symbols-outlined shrink-0" style="color:var(--accent-gold); margin-top:2px;">help</span>
+                    <div>
+                        <h3 class="text-h4 mb-8">What are time credits and how do they work?</h3>
+                        <p class="text-body">Time credits are the currency of HourX. 1 credit = 1 hour of service. You start with 5 credits and earn more by completing barter requests from other users. When someone requests your skill, you receive their credits upon successful completion.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="flex items-start gap-16">
+                    <span class="material-symbols-outlined shrink-0" style="color:var(--accent-purple); margin-top:2px;">help</span>
+                    <div>
+                        <h3 class="text-h4 mb-8">What is the escrow system?</h3>
+                        <p class="text-body">When you send a barter request, the requested hours are deducted from your balance and held in escrow. If the provider accepts and completes the service, the hours are released to them. If rejected or canceled, the hours are returned to you. This protects both parties.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="flex items-start gap-16">
+                    <span class="material-symbols-outlined shrink-0" style="color:var(--accent-amber); margin-top:2px;">help</span>
+                    <div>
+                        <h3 class="text-h4 mb-8">How do meetings work?</h3>
+                        <p class="text-body">Once a request is accepted, both parties can join a private video meeting room powered by Jitsi Meet directly from the request page. The room is unique to your exchange and accessible only to the sender and receiver.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="flex items-start gap-16">
+                    <span class="material-symbols-outlined shrink-0" style="color:var(--accent-rose); margin-top:2px;">help</span>
+                    <div>
+                        <h3 class="text-h4 mb-8">Can I cancel a request after it's accepted?</h3>
+                        <p class="text-body">Yes, the sender can cancel an accepted request. The escrowed hours will be returned to the sender's balance. However, frequent cancellations may affect your reputation on the platform.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="flex items-start gap-16">
+                    <span class="material-symbols-outlined shrink-0" style="color:var(--accent-copper); margin-top:2px;">help</span>
+                    <div>
+                        <h3 class="text-h4 mb-8">How do reviews work?</h3>
+                        <p class="text-body">After a barter request is marked as completed, the sender can leave a review for the provider. Reviews include a 1-5 star rating and a written comment. You can only review users you've successfully exchanged with.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="flex items-start gap-16">
+                    <span class="material-symbols-outlined shrink-0" style="color:var(--accent-gold); margin-top:2px;">help</span>
+                    <div>
+                        <h3 class="text-h4 mb-8">Is HourX free to use?</h3>
+                        <p class="text-body">Yes, HourX is completely free. There are no subscription fees, transaction fees, or hidden costs. The platform is designed to facilitate genuine time-based exchanges between users.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="background:linear-gradient(135deg, rgba(212,132,90,0.04), rgba(201,169,110,0.03)); border-color:rgba(212,132,90,0.1);">
+        <div class="grid grid-12" style="gap:32px;">
+            <div class="col-span-7">
+                <h2 class="text-h2 mb-12">Still need help?</h2>
+                <p class="text-body mb-24">Drop us a message and our team will get back to you within 24 hours.</p>
+                <div class="flex flex-col gap-12">
+                    <div class="flex items-center gap-12">
+                        <span class="material-symbols-outlined" style="color:var(--accent-copper);">mail</span>
+                        <span class="text-body">support@hourx.io</span>
+                    </div>
+                    <div class="flex items-center gap-12">
+                        <span class="material-symbols-outlined" style="color:var(--accent-copper);">schedule</span>
+                        <span class="text-body">Response within 24 hours</span>
+                    </div>
+                    <div class="flex items-center gap-12">
+                        <span class="material-symbols-outlined" style="color:var(--accent-copper);">language</span>
+                        <span class="text-body">English support available</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-5 flex flex-col gap-16">
+                <div class="form-group">
+                    <label class="form-label">Subject</label>
+                    <input type="text" class="form-input" placeholder="Brief description of your issue">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-textarea" rows="4" placeholder="Tell us more..."></textarea>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="alert('Support form coming soon! Email support@hourx.io for now.')">
+                    <span class="material-symbols-outlined">send</span> Send Message
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -14,7 +14,15 @@ def create_request(request, skill_id):
         return redirect('skill_detail', pk=skill_id)
 
     if request.method == 'POST':
-        hours = int(request.POST.get('hours', 1))
+        try:
+            hours = int(request.POST.get('hours', 1))
+        except ValueError:
+            hours = 1
+            
+        if hours <= 0:
+            messages.error(request, "Hours must be greater than zero.")
+            return redirect('skill_detail', pk=skill_id)
+            
         message = request.POST.get('message', '')
         # Check if sender has enough balance
         if request.user.time_balance < hours:
@@ -67,6 +75,29 @@ def complete_request(request, request_id):
     try:
         services.release_escrow(request_id)
         messages.success(request, "Transaction completed. Hours released to receiver.")
+    except Exception as e:
+        messages.error(request, str(e))
+    return redirect('sent_requests')
+
+@login_required
+@require_POST
+def reject_request(request, request_id):
+    barter_req = get_object_or_404(BarterRequest, id=request_id, receiver=request.user)
+    try:
+        services.reject_request(request_id)
+        messages.success(request, "Request rejected.")
+    except Exception as e:
+        messages.error(request, str(e))
+    return redirect('received_requests')
+
+@login_required
+@require_POST
+def cancel_request(request, request_id):
+    # Depending on business logic, maybe only sender can cancel
+    barter_req = get_object_or_404(BarterRequest, id=request_id, sender=request.user)
+    try:
+        services.cancel_request(request_id)
+        messages.success(request, "Request canceled.")
     except Exception as e:
         messages.error(request, str(e))
     return redirect('sent_requests')

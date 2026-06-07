@@ -1,43 +1,29 @@
 {% extends "base.html" %}
 
-{% block title %}{% if is_edit %}Edit Skill{% else %}Offer Skill{% endif %} - HOURX{% endblock %}
+{% block title %}{% if is_edit %}Edit Skill{% else %}Offer Skill{% endif %} – HourX{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto animate-fade-in">
-    <div class="card p-0 overflow-hidden">
-        <div class="p-8 border-b border-color-border" style="background: rgba(255,255,255,0.02)">
-            <h2 class="text-2xl font-bold">{% if is_edit %}Edit Skill{% else %}Offer a New Skill{% endif %}</h2>
-            <p class="text-muted text-sm mt-1">Share your expertise with the community</p>
+<div class="container-sm">
+    <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:32px; border-bottom:1px solid var(--border-glass);">
+            <h2 class="text-h2">{% if is_edit %}Edit Skill{% else %}Offer a New Skill{% endif %}</h2>
+            <p class="text-small mt-4">Share your expertise with the community.</p>
         </div>
-
-        <div class="p-8">
-            <form method="post" class="space-y-6">
+        <div style="padding:32px;">
+            <form method="post" class="flex flex-col gap-24">
                 {% csrf_token %}
-
                 {% for field in form %}
                 <div class="form-group">
                     <label class="form-label">{{ field.label }}</label>
                     {{ field }}
-                    {% if field.help_text %}
-                    <p class="text-xs text-muted mt-1">{{ field.help_text }}</p>
-                    {% endif %}
-                    {% for error in field.errors %}
-                    <p class="text-xs text-error mt-1">{{ error }}</p>
-                    {% endfor %}
+                    {% if field.help_text %}<p class="form-hint">{{ field.help_text }}</p>{% endif %}
+                    {% for error in field.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
                 </div>
                 {% endfor %}
-
-                <script>
-                    document.querySelectorAll('input, textarea').forEach(el => {
-                        el.classList.add('form-control');
-                    });
-                </script>
-
-                <div class="flex justify-end gap-4 pt-4 border-t border-color-border mt-6">
+                <div class="divider"></div>
+                <div class="flex gap-12 justify-end" style="flex-wrap:wrap;">
                     <a href="{% url 'skill_list' %}" class="btn btn-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-primary">
-                        Save Skill
-                    </button>
+                    <button type="submit" class="btn btn-primary">Save Skill</button>
                 </div>
             </form>
         </div>

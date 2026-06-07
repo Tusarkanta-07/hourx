@@ -1,44 +1,110 @@
 {% extends "base.html" %}
 
-{% block title %}Marketplace - HOURX{% endblock %}
+{% block title %}Marketplace – HourX{% endblock %}
 
 {% block content %}
-<div class="container section-py animate-fade-in">
-    <div class="marketplace-header">
-        <h1
-            style="font-size: 2.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; line-height: 1.2;">
-            Marketplace
-        </h1>
-        <p style="font-size: 1.125rem; color: var(--text-secondary);">Discover services offered by the community.</p>
-    </div>
-
-    {% if skills %}
-    <div class="marketplace-grid">
-        {% for skill in skills %}
-        <a href="{% url 'skill_detail' pk=skill.pk %}" class="skill-card">
-            <div class="skill-cover">
-                {{ skill.title|slice:":2"|upper }}
-            </div>
-            <div class="skill-body">
-                <h3 class="skill-title">{{ skill.title }}</h3>
-                <p class="skill-desc">
-                    {{ skill.description|truncatechars:80 }}
-                </p>
-                <div class="skill-footer">
-                    <div class="user-avatar">
-                        {{ skill.user.username|slice:":1"|upper }}
+<div class="container">
+    <div class="grid grid-12" style="gap:32px;">
+        <!-- Sidebar Filters -->
+        <aside class="col-span-3 hide-tablet">
+            <div class="card sticky top-100">
+                <form method="get" action="{% url 'skill_list' %}" id="filter-form">
+                    {% if query %}
+                    <input type="hidden" name="q" value="{{ query }}">
+                    {% endif %}
+                    
+                    <h2 class="text-h3 mb-24">Filters</h2>
+                    <div class="mb-24">
+                        <div class="text-label mb-12">Categories</div>
+                        <div class="flex flex-col gap-8">
+                            <label class="flex items-center gap-12" style="cursor:pointer; padding:6px 0;">
+                                <input type="checkbox" name="category" value="Design" onchange="this.form.submit()" {% if 'Design' in selected_categories %}checked{% endif %} class="form-checkbox">
+                                <span class="text-small">Design</span>
+                            </label>
+                            <label class="flex items-center gap-12" style="cursor:pointer; padding:6px 0;">
+                                <input type="checkbox" name="category" value="Development" onchange="this.form.submit()" {% if 'Development' in selected_categories %}checked{% endif %} class="form-checkbox">
+                                <span class="text-small">Development</span>
+                            </label>
+                            <label class="flex items-center gap-12" style="cursor:pointer; padding:6px 0;">
+                                <input type="checkbox" name="category" value="Writing" onchange="this.form.submit()" {% if 'Writing' in selected_categories %}checked{% endif %} class="form-checkbox">
+                                <span class="text-small">Writing</span>
+                            </label>
+                            <label class="flex items-center gap-12" style="cursor:pointer; padding:6px 0;">
+                                <input type="checkbox" name="category" value="Music" onchange="this.form.submit()" {% if 'Music' in selected_categories %}checked{% endif %} class="form-checkbox">
+                                <span class="text-small">Music</span>
+                            </label>
+                        </div>
                     </div>
-                    <span class="user-name">{{ skill.user.username }}</span>
-                </div>
+                    <div>
+                        <div class="text-label mb-12">Minimum Rating</div>
+                        <div class="stars">
+                            <span class="material-symbols-outlined">star</span>
+                            <span class="material-symbols-outlined">star</span>
+                            <span class="material-symbols-outlined">star</span>
+                            <span class="material-symbols-outlined">star</span>
+                            <span class="material-symbols-outlined" style="color:var(--text-muted); font-variation-settings:'FILL' 0;">star</span>
+                            <span class="text-small" style="margin-left:8px;">& Up</span>
+                        </div>
+                    </div>
+                    {% if selected_categories %}
+                    <div style="margin-top:24px;">
+                        <a href="{% url 'skill_list' %}{% if query %}?q={{ query }}{% endif %}" class="btn btn-secondary btn-sm" style="width:100%; text-align:center;">Clear Filters</a>
+                    </div>
+                    {% endif %}
+                </form>
             </div>
-        </a>
-        {% endfor %}
+        </aside>
+
+        <!-- Main Content -->
+        <section class="col-span-9">
+            <header class="mb-32">
+                <h1 class="text-h1 mb-8">Explore Skills</h1>
+                <p class="text-body mb-24">Find the expertise you need and exchange your time.</p>
+                <form method="get" action="{% url 'skill_list' %}" class="flex gap-12" style="flex-wrap:wrap;">
+                    <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search skills, users, or topics..." class="form-input flex-1" style="min-width:200px;">
+                    {% for cat in selected_categories %}
+                    <input type="hidden" name="category" value="{{ cat }}">
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    {% if query or selected_categories %}
+                    <a href="{% url 'skill_list' %}" class="btn btn-secondary">Clear</a>
+                    {% endif %}
+                </form>
+            </header>
+
+            {% if skills %}
+            <div class="grid grid-3">
+                {% for skill in skills %}
+                <article class="card card-interactive card-glow" style="padding:0; display:flex; flex-direction:column;">
+                    <div class="card-orb card-orb-blue"></div>
+                    <div style="height:140px; background:linear-gradient(135deg, rgba(212,132,90,0.06), rgba(201,169,110,0.04)); border-bottom:1px solid var(--border-glass); position:relative; display:flex; align-items:flex-end; padding:16px;">
+                        <span class="badge badge-accepted">{{ skill.category }}</span>
+                    </div>
+                    <div style="padding:20px; flex:1; display:flex; flex-direction:column; gap:8px;">
+                        <h3 class="text-h4">{{ skill.title }}</h3>
+                        <p class="text-small line-clamp-2" style="flex:1;">{{ skill.description }}</p>
+                        <div class="flex items-center gap-8 mt-8">
+                            <span class="material-symbols-outlined" style="font-size:16px; color:var(--text-muted);">person</span>
+                            <span class="text-small font-semibold">{{ skill.user.username }}</span>
+                        </div>
+                    </div>
+                    <div style="padding:16px 20px; border-top:1px solid var(--border-glass); display:flex; align-items:center; justify-content:space-between;">
+                        <div class="flex items-center gap-4" style="color:var(--accent-copper);">
+                            <span class="material-symbols-outlined" style="font-size:18px;">schedule</span>
+                            <span class="text-small font-bold">1 hr+</span>
+                        </div>
+                        <a href="{% url 'skill_detail' pk=skill.pk %}" class="btn btn-primary btn-sm">View</a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card text-center" style="padding:60px;">
+                <p class="text-body mb-24">No skills listed yet.</p>
+                <a href="{% url 'skill_create' %}" class="btn btn-primary">List a Service</a>
+            </div>
+            {% endif %}
+        </section>
     </div>
-    {% else %}
-    <div class="card text-center" style="padding: 60px;">
-        <p class="text-muted" style="margin-bottom: 16px;">No skills listed yet.</p>
-        <a href="{% url 'skill_create' %}" class="btn btn-primary">List a Service</a>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

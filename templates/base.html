@@ -1,47 +1,68 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}HOURX{% endblock %}</title>
+    <meta name="description" content="HourX - The premium time-exchange economy. Trade skills using secure escrowed time credits.">
+    <title>{% block title %}HourX{% endblock %}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    {% load static %}
-    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
 </head>
-
 <body>
-    <!-- Background Elements -->
     <div class="ambient-bg">
-        <div class="ambient-orb orb-1"></div>
-        <div class="ambient-orb orb-2"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
     </div>
 
-    {% include "partials/navbar.html" %}
+    <div class="page-wrapper">
+        {% include "partials/navbar.html" %}
 
-    <main class="main-content container animate-fade-in">
-        {% if messages %}
-        <div class="messages-container">
-            {% for message in messages %}
-            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
-                <i
-                    class="fa-solid {% if message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-check{% endif %}"></i>
-                {{ message }}
+        <main class="main-content">
+            {% if messages %}
+            <div class="container" style="margin-bottom: 24px;">
+                {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                    <span class="material-symbols-outlined">
+                        {% if message.tags == 'error' %}error{% else %}check_circle{% endif %}
+                    </span>
+                    <span>{{ message }}</span>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+            {% endif %}
 
-        {% block content %}{% endblock %}
-    </main>
+            {% block content %}{% endblock %}
+        </main>
 
-    {% include "partials/footer.html" %}
+        {% include "partials/footer.html" %}
+    </div>
+
+    <script>
+        // Mobile nav toggle
+        const toggle = document.querySelector('.nav-toggle');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        if (toggle && mobileMenu) {
+            toggle.addEventListener('click', () => mobileMenu.classList.toggle('active'));
+        }
+
+        // Style Django form fields automatically
+        document.querySelectorAll('form input:not([type="hidden"]):not([type="submit"]):not([type="file"]):not([type="checkbox"]):not([type="radio"])').forEach(el => {
+            if (!el.classList.contains('form-input')) el.classList.add('form-input');
+        });
+        document.querySelectorAll('form textarea').forEach(el => {
+            if (!el.classList.contains('form-textarea')) el.classList.add('form-textarea');
+        });
+        document.querySelectorAll('form select').forEach(el => {
+            if (!el.classList.contains('form-select')) el.classList.add('form-select');
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
 </body>
-
 </html>

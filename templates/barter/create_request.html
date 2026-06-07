@@ -1,63 +1,95 @@
 {% extends "base.html" %}
 
-{% block title %}Request Service - HOURX{% endblock %}
+{% block title %}Request Service – HourX{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto animate-fade-in">
-    <div class="card p-0 overflow-hidden">
-        <div class="p-6 md:p-8 text-center"
-            style="background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));">
-            <h2 class="text-2xl font-bold font-heading text-white">Request Service</h2>
-            <p class="text-white/80 text-sm mt-1">Initiate a barter transaction</p>
-        </div>
+<div class="container-md">
+    <div class="flex items-center gap-12 mb-32">
+        <a href="{% url 'skill_detail' pk=skill.pk %}" class="avatar avatar-sm" style="text-decoration:none;">
+            <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span>
+        </a>
+        <h1 class="text-h2">Request Details</h1>
+    </div>
 
-        <div class="p-8">
-            <div class="bg-surface-light p-4 rounded-xl border border-color-border mb-6 text-sm">
-                <div class="flex justify-between mb-2">
-                    <span class="text-muted">Service:</span>
-                    <span class="font-bold text-white">{{ skill.title }}</span>
+    <div class="steps mb-40">
+        <div class="step step-active">
+            <div class="step-circle"><span class="material-symbols-outlined" style="font-size:18px;">check</span></div>
+            <span class="step-label">Request</span>
+        </div>
+        <div class="step">
+            <div class="step-circle"><span class="material-symbols-outlined" style="font-size:18px;">lock</span></div>
+            <span class="step-label">Escrow</span>
+        </div>
+        <div class="step">
+            <div class="step-circle"><span class="material-symbols-outlined" style="font-size:18px;">flag</span></div>
+            <span class="step-label">Completion</span>
+        </div>
+    </div>
+
+    <div class="grid grid-12" style="gap:32px;">
+        <div class="col-span-5 flex flex-col gap-20">
+            <div class="card" style="position:relative; overflow:hidden;">
+                <div class="card-orb card-orb-blue"></div>
+                <span class="text-label" style="color:var(--accent-copper);">Request</span>
+                <h2 class="text-h1 mt-8">Ready to Send</h2>
+                <p class="text-body mt-8">Your hours will be held in escrow when the provider accepts.</p>
+            </div>
+            <div class="card flex flex-col gap-20">
+                <div class="flex justify-between items-center" style="padding-bottom:16px; border-bottom:1px solid var(--border-glass);">
+                    <div>
+                        <div class="text-label mb-4">Service</div>
+                        <div class="font-semibold text-body-lg">{{ skill.title }}</div>
+                    </div>
+                    <div class="stat-icon" style="background:rgba(212,132,90,0.06); border:1px solid rgba(212,132,90,0.12);">
+                        <span class="material-symbols-outlined" style="color:var(--accent-copper);">schedule</span>
+                    </div>
                 </div>
-                <div class="flex justify-between mb-2">
-                    <span class="text-muted">Provider:</span>
-                    <span class="font-bold text-white">{{ skill.user.username }}</span>
+                <div class="flex items-center gap-16">
+                    <div class="avatar">{{ skill.user.username|slice:":1"|upper }}</div>
+                    <div>
+                        <div class="text-label mb-4">Provider</div>
+                        <div class="font-semibold">{{ skill.user.username }}</div>
+                        <div class="flex items-center gap-4 mt-4" style="color:var(--accent-copper);">
+                            <span class="material-symbols-outlined" style="font-size:14px;">verified</span>
+                            <span class="text-xs">Verified</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="border-t border-color-border my-2 pt-2 flex justify-between">
-                    <span class="text-muted">Your Balance:</span>
-                    <span class="font-bold {% if user.time_balance == 0 %}text-error{% else %}text-success{% endif %}">
-                        {{ user.time_balance }} Hours
-                    </span>
+                <div class="flex justify-between text-small">
+                    <span>Your Balance</span>
+                    <span class="font-semibold" style="color:var(--text-primary);">{{ user.time_balance }} hrs</span>
                 </div>
             </div>
-
-            <form method="post" class="space-y-6">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label class="form-label">Hours Requested</label>
-                    <div class="relative">
-                        <input type="number" name="hours" value="1" min="1" max="{{ user.time_balance }}"
-                            class="form-control font-bold text-lg" required>
-                        <span
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-muted text-sm font-medium">hrs</span>
+        </div>
+        <div class="col-span-7">
+            <div class="card">
+                <form method="post" class="flex flex-col gap-24">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label">Hours Requested</label>
+                        <div class="relative">
+                            <input type="number" name="hours" value="1" min="1" max="{{ user.time_balance }}" required class="form-input" style="padding-right:50px;">
+                            <span style="position:absolute; right:18px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:14px;">hrs</span>
+                        </div>
+                        <p class="form-hint">
+                            <span class="material-symbols-outlined" style="font-size:14px;">lock</span>
+                            Amount will be held in escrow upon acceptance.
+                        </p>
                     </div>
-                    <p class="text-xs text-muted mt-2">
-                        <i class="fa-solid fa-lock mr-1"></i>Amount will be held in escrow upon acceptance.
-                    </p>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Message</label>
-                    <textarea name="message" rows="4" class="form-control resize-none"
-                        placeholder="Hi, I'd like to request your help with..."></textarea>
-                </div>
-
-                <div class="flex gap-3 pt-2">
-                    <a href="{% url 'skill_detail' pk=skill.pk %}"
-                        class="btn btn-secondary flex-1 justify-center">Cancel</a>
-                    <button type="submit" class="btn btn-primary flex-[2] justify-center">
-                        Send Request
-                    </button>
-                </div>
-            </form>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea name="message" rows="4" class="form-textarea" placeholder="Hi, I'd like to request your help with..."></textarea>
+                    </div>
+                    <div class="flex gap-12" style="flex-wrap:wrap;">
+                        <a href="{% url 'skill_detail' pk=skill.pk %}" class="btn btn-secondary flex-1">
+                            <span class="material-symbols-outlined">close</span> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary flex-1">
+                            <span class="material-symbols-outlined">send</span> Send Request
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

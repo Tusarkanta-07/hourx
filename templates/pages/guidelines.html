@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Community Guidelines – HourX{% endblock %}
+
+{% block content %}
+<div class="container-md" style="padding-bottom:80px;">
+    <div class="text-center mb-32" style="padding-top:20px;">
+        <span class="badge badge-pending" style="padding:6px 16px; font-size:12px; margin-bottom:16px;">
+            <span class="material-symbols-outlined" style="font-size:14px;">diversity_3</span> Community
+        </span>
+        <h1 class="text-h1 mb-12">Community Guidelines</h1>
+        <p class="text-body" style="max-width:550px; margin:0 auto;">HourX thrives because of its community. These guidelines help us maintain a safe, respectful, and productive environment for everyone.</p>
+    </div>
+
+    <div class="grid grid-4 mb-32" style="gap:16px;">
+        <div class="card text-center" style="padding:24px;">
+            <span class="material-symbols-outlined mb-12" style="font-size:32px; color:var(--accent-copper);">handshake</span>
+            <div class="font-semibold mb-4">Integrity</div>
+            <p class="text-xs">Honor your commitments and deliver quality work</p>
+        </div>
+        <div class="card text-center" style="padding:24px;">
+            <span class="material-symbols-outlined mb-12" style="font-size:32px; color:var(--accent-gold);">favorite</span>
+            <div class="font-semibold mb-4">Respect</div>
+            <p class="text-xs">Treat every member with dignity and kindness</p>
+        </div>
+        <div class="card text-center" style="padding:24px;">
+            <span class="material-symbols-outlined mb-12" style="font-size:32px; color:var(--accent-purple);">visibility</span>
+            <div class="font-semibold mb-4">Transparency</div>
+            <p class="text-xs">Be honest about your skills and availability</p>
+        </div>
+        <div class="card text-center" style="padding:24px;">
+            <span class="material-symbols-outlined mb-12" style="font-size:32px; color:var(--accent-amber);">shield</span>
+            <div class="font-semibold mb-4">Safety</div>
+            <p class="text-xs">Prioritize everyone's well-being in all interactions</p>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-32">
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(212,132,90,0.06); border:1px solid rgba(212,132,90,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-copper);">verified</span></div>
+                <h2 class="text-h3">Be Honest & Accurate</h2>
+            </div>
+            <p class="text-body">Accurately represent your skills, experience, and availability in your listings. Don't exaggerate what you can deliver. If you're a beginner at something, that's perfectly fine — just be upfront about it.</p>
+            <div class="mt-16 grid grid-2" style="gap:12px;">
+                <div class="p-16" style="background:rgba(52,211,153,0.04); border:1px solid rgba(52,211,153,0.1); border-radius:var(--radius-md);">
+                    <div class="flex items-center gap-8 mb-8"><span class="material-symbols-outlined" style="color:var(--accent-emerald); font-size:18px;">check_circle</span><span class="font-semibold text-small" style="color:var(--accent-emerald);">Do</span></div>
+                    <p class="text-small">"I have 2 years of experience with Python and can help with scripting and automation."</p>
+                </div>
+                <div class="p-16" style="background:rgba(251,113,133,0.04); border:1px solid rgba(251,113,133,0.1); border-radius:var(--radius-md);">
+                    <div class="flex items-center gap-8 mb-8"><span class="material-symbols-outlined" style="color:var(--accent-rose); font-size:18px;">cancel</span><span class="font-semibold text-small" style="color:var(--accent-rose);">Don't</span></div>
+                    <p class="text-small">"Expert full-stack developer, AI specialist, and DevOps engineer" (when you're a beginner).</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(201,169,110,0.06); border:1px solid rgba(201,169,110,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-gold);">forum</span></div>
+                <h2 class="text-h3">Communicate Respectfully</h2>
+            </div>
+            <p class="text-body">All messages, reviews, and interactions should be respectful and constructive. Disagreements happen — handle them maturely.</p>
+            <div class="flex flex-col gap-12 mt-16">
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-copper); margin-top:2px;">check</span><p class="text-body">Use professional and friendly language in all communications</p></div>
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-copper); margin-top:2px;">check</span><p class="text-body">Give constructive feedback in reviews — focus on specific experiences</p></div>
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-copper); margin-top:2px;">check</span><p class="text-body">Respond to messages and requests in a timely manner</p></div>
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-rose); margin-top:2px;">close</span><p class="text-body">No hate speech, bullying, harassment, or discriminatory language</p></div>
+                <div class="flex items-start gap-12"><span class="material-symbols-outlined" style="color:var(--accent-rose); margin-top:2px;">close</span><p class="text-body">No spam, unsolicited promotions, or repetitive messaging</p></div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-purple);">task_alt</span></div>
+                <h2 class="text-h3">Honor Your Commitments</h2>
+            </div>
+            <p class="text-body">When you accept a barter request, you're making a commitment. Follow through on your promises. The escrow system protects both parties, but trust is what makes HourX work.</p>
+            <div class="mt-16 p-24" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);">
+                <div class="text-label mb-12" style="color:var(--accent-copper);">Best Practices</div>
+                <div class="flex flex-col gap-8">
+                    <p class="text-body">• Respond to requests within 48 hours</p>
+                    <p class="text-body">• Set clear expectations before accepting a request</p>
+                    <p class="text-body">• If you can't fulfill a commitment, communicate early and cancel properly</p>
+                    <p class="text-body">• Complete sessions to the best of your ability</p>
+                    <p class="text-body">• Leave honest reviews after every completed exchange</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-amber);">star</span></div>
+                <h2 class="text-h3">Leave Fair Reviews</h2>
+            </div>
+            <p class="text-body">Reviews build trust in the community. When leaving a review, be honest, specific, and fair. Mention what went well and what could be improved.</p>
+            <p class="text-body mt-16">Fake reviews, retaliatory reviews, or reviews based on personal grudges rather than the actual service experience are prohibited and may be removed.</p>
+        </section>
+
+        <section class="card">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(251,113,133,0.08); border:1px solid rgba(251,113,133,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-rose);">security</span></div>
+                <h2 class="text-h3">Stay Safe</h2>
+            </div>
+            <p class="text-body">While HourX is designed for safe skill exchanges, always exercise good judgment:</p>
+            <div class="grid grid-2 mt-16" style="gap:12px;">
+                <div class="p-16" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);"><span class="material-symbols-outlined mb-8" style="color:var(--accent-amber);">vpn_key</span><p class="text-small">Never share passwords, financial details, or sensitive personal information during exchanges</p></div>
+                <div class="p-16" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);"><span class="material-symbols-outlined mb-8" style="color:var(--accent-amber);">report</span><p class="text-small">Report suspicious behavior, harassment, or Terms violations to our support team immediately</p></div>
+                <div class="p-16" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);"><span class="material-symbols-outlined mb-8" style="color:var(--accent-amber);">videocam</span><p class="text-small">Use the built-in Jitsi meeting system for video calls rather than sharing personal contact details</p></div>
+                <div class="p-16" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md);"><span class="material-symbols-outlined mb-8" style="color:var(--accent-amber);">verified_user</span><p class="text-small">Check user reviews and profile history before accepting or sending exchange requests</p></div>
+            </div>
+        </section>
+
+        <section class="card" style="border-color:rgba(251,113,133,0.12);">
+            <div class="flex items-center gap-12 mb-16">
+                <div class="stat-icon" style="background:rgba(251,113,133,0.08); border:1px solid rgba(251,113,133,0.12);"><span class="material-symbols-outlined" style="color:var(--accent-rose);">gavel</span></div>
+                <h2 class="text-h3">Enforcement</h2>
+            </div>
+            <p class="text-body">Violations of these guidelines may result in:</p>
+            <div class="flex flex-col gap-12 mt-16">
+                <div class="flex items-center gap-12"><span class="badge badge-pending" style="min-width:80px; justify-content:center;">Warning</span><p class="text-body">First-time minor violations receive a warning</p></div>
+                <div class="flex items-center gap-12"><span class="badge badge-accepted" style="min-width:80px; justify-content:center;">Restriction</span><p class="text-body">Repeated violations may restrict account features</p></div>
+                <div class="flex items-center gap-12"><span class="badge badge-rejected" style="min-width:80px; justify-content:center;">Suspension</span><p class="text-body">Serious or repeated violations lead to account suspension</p></div>
+            </div>
+        </section>
+
+        <section class="card text-center" style="background:linear-gradient(135deg, rgba(212,132,90,0.04), rgba(201,169,110,0.03)); border-color:rgba(212,132,90,0.1);">
+            <h3 class="text-h3 mb-8">Together we build trust</h3>
+            <p class="text-body mb-24" style="max-width:500px; margin-left:auto; margin-right:auto;">These guidelines exist to make HourX a place where everyone feels welcome and valued. Thank you for being part of this community.</p>
+            <div class="flex gap-12 justify-center" style="flex-wrap:wrap;">
+                <a href="{% url 'skill_list' %}" class="btn btn-primary"><span class="material-symbols-outlined">storefront</span> Browse Marketplace</a>
+                <a href="{% url 'support' %}" class="btn btn-secondary"><span class="material-symbols-outlined">mail</span> Report an Issue</a>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

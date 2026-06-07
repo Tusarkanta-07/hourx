@@ -6,11 +6,25 @@ from django import forms
 class SkillForm(forms.ModelForm):
     class Meta:
         model = Skill
-        fields = ['title', 'description']
+        fields = ['title', 'description', 'category']
 
 def skill_list(request):
+    query = request.GET.get('q')
+    selected_categories = request.GET.getlist('category')
     skills = Skill.objects.all().order_by('-created_at')
-    return render(request, 'skills/list.html', {'skills': skills})
+    
+    if query:
+        skills = skills.filter(title__icontains=query) | skills.filter(description__icontains=query)
+        skills = skills.distinct()
+        
+    if selected_categories:
+        skills = skills.filter(category__in=selected_categories)
+
+    return render(request, 'skills/list.html', {
+        'skills': skills,
+        'query': query,
+        'selected_categories': selected_categories
+    })
 
 def skill_detail(request, pk):
     skill = get_object_or_404(Skill, pk=pk)
@@ -44,3 +58,14 @@ def skill_edit(request, pk):
     else:
         form = SkillForm(instance=skill)
     return render(request, 'skills/add.html', {'form': form, 'is_edit': True})
+
+from django.contrib import messages
+from django.views.decorators.http import require_POST
+
+@login_required
+@require_POST
+def skill_delete(request, pk):
+    skill = get_object_or_404(Skill, pk=pk, user=request.user)
+    skill.delete()
+    messages.success(request, f"Skill '{skill.title}' deleted successfully.")
+    return redirect('skill_list')

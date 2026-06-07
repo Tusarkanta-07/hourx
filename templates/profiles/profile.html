@@ -1,86 +1,145 @@
 {% extends "base.html" %}
 
-{% block title %}{{ user.username }} - Profile{% endblock %}
+{% block title %}{{ user.username }} – Profile{% endblock %}
 
 {% block content %}
-<div style="background: var(--bg-surface); padding: 48px 0; border-bottom: 1px solid var(--border-light);">
-    <div class="container">
-        <div class="flex items-center gap-6">
-            <div
-                style="width: 96px; height: 96px; background: white; border: 1px solid var(--border-medium); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700;">
+<div class="container">
+    <!-- Profile Header -->
+    <section class="card mb-32" style="padding:0; overflow:hidden;">
+        <div style="height:4px; background:linear-gradient(90deg, var(--accent-copper), var(--accent-gold), var(--accent-purple));"></div>
+        <div style="padding:36px;" class="flex gap-32" style="flex-wrap:wrap;">
+            <div class="shrink-0">
                 {% if user.profile_picture %}
-                <img src="{{ user.profile_picture.url }}"
-                    style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                <div class="avatar-xl"><img src="{{ user.profile_picture.url }}" alt="{{ user.username }}"></div>
                 {% else %}
-                {{ user.username|slice:":1"|upper }}
+                <div class="avatar-xl">{{ user.username|slice:":1"|upper }}</div>
                 {% endif %}
             </div>
-            <div>
-                <h1 style="font-size: 32px; margin-bottom: 4px;">{{ user.username }}</h1>
-                <p class="text-muted">{{ user.email }}</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container section-py">
-    <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 48px;">
-        <div class="flex-col gap-8">
-            <!-- About -->
-            <section>
-                <h3 style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 16px;">
-                    About</h3>
-                {% if user.bio %}
-                <p class="text-secondary">{{ user.bio|linebreaksbr }}</p>
-                {% else %}
-                <p class="text-muted italic">No bio provided.</p>
-                {% endif %}
-            </section>
-
-            <!-- Services -->
-            <section>
-                <div class="flex justify-between items-center mb-4 border-bottom"
-                    style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px;">
-                    <h3 style="margin: 0;">Services</h3>
-                    {% if request.user == user %}
-                    <a href="{% url 'skill_create' %}" class="text-sm font-bold text-primary">+ Add</a>
-                    {% endif %}
+            <div class="flex-1 flex flex-col gap-8" style="min-width:0;">
+                <h1 class="text-h1">{{ user.username }}</h1>
+                <div class="flex items-center gap-16 text-small" style="flex-wrap:wrap;">
+                    <span class="flex items-center gap-4">
+                        <span class="material-symbols-outlined" style="font-size:16px;">calendar_today</span>
+                        Member since {{ user.date_joined|date:"Y" }}
+                    </span>
+                    <span class="flex items-center gap-4">
+                        <span class="material-symbols-outlined" style="font-size:16px;">mail</span>
+                        {{ user.email|default:"No email on file" }}
+                    </span>
                 </div>
-
-                {% if user.skills.all %}
-                <div class="flex-col gap-4">
-                    {% for skill in user.skills.all %}
-                    <a href="{% url 'skill_detail' pk=skill.pk %}" class="card"
-                        style="display:flex; justify-content: space-between; align-items: center; padding: 16px;">
-                        <div>
-                            <div class="font-bold">{{ skill.title }}</div>
-                            <div class="text-xs text-muted">{{ skill.description|truncatechars:60 }}</div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-muted text-xs"></i>
+                <p class="text-body mt-8" style="max-width:600px;">
+                    {% if user.bio %}{{ user.bio|linebreaksbr }}{% else %}Share a short bio to help others understand your strengths.{% endif %}
+                </p>
+                <div class="flex gap-12 mt-16" style="flex-wrap:wrap;">
+                    <a href="{% url 'skill_create' %}" class="btn btn-primary btn-sm">
+                        <span class="material-symbols-outlined">handshake</span> Offer Time
                     </a>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <p class="text-muted">No services listed.</p>
-                {% endif %}
-            </section>
-        </div>
-
-        <div>
-            <div class="card">
-                <h3 style="font-size: 18px; margin-bottom: 16px;">Stats</h3>
-                <div class="flex justify-between py-2 border-bottom"
-                    style="border-bottom: 1px solid var(--border-light);">
-                    <span class="text-muted">Joined</span>
-                    <span class="font-bold">{{ user.date_joined|date:"M Y" }}</span>
-                </div>
-                <div class="flex justify-between py-2 border-bottom"
-                    style="border-bottom: 1px solid var(--border-light);">
-                    <span class="text-muted">Listings</span>
-                    <span class="font-bold">{{ user.skills.count }}</span>
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-sm">Dashboard</a>
                 </div>
             </div>
         </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="grid grid-3 mb-32">
+        <div class="stat-card card-interactive">
+            <div class="card-orb card-orb-teal"></div>
+            <div class="flex justify-between items-start mb-16 relative z-10">
+                <span class="text-body" style="color:var(--text-muted);">Listings</span>
+                <div class="stat-icon" style="background:rgba(212,132,90,0.06); border:1px solid rgba(212,132,90,0.12);">
+                    <span class="material-symbols-outlined" style="color:var(--accent-copper);">list_alt</span>
+                </div>
+            </div>
+            <div class="relative z-10 flex items-end gap-8">
+                <span class="stat-value">{{ user.skills.count }}</span>
+                <span class="text-small" style="color:var(--accent-copper); margin-bottom:4px;">skills</span>
+            </div>
+        </div>
+        <div class="stat-card card-interactive">
+            <div class="card-orb card-orb-purple"></div>
+            <div class="flex justify-between items-start mb-16 relative z-10">
+                <span class="text-body" style="color:var(--text-muted);">Sent Requests</span>
+                <div class="stat-icon" style="background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.12);">
+                    <span class="material-symbols-outlined" style="color:var(--accent-purple);">send</span>
+                </div>
+            </div>
+            <div class="relative z-10 flex items-end gap-8">
+                <span class="stat-value">{{ user.sent_requests.count }}</span>
+                <span class="text-small" style="color:var(--accent-purple); margin-bottom:4px;">total</span>
+            </div>
+        </div>
+        <div class="stat-card card-interactive">
+            <div class="card-orb card-orb-blue"></div>
+            <div class="flex justify-between items-start mb-16 relative z-10">
+                <span class="text-body" style="color:var(--text-muted);">Reviews</span>
+                <div class="stat-icon" style="background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.12);">
+                    <span class="material-symbols-outlined" style="color:var(--accent-amber);">star</span>
+                </div>
+            </div>
+            <div class="relative z-10 flex items-end gap-8">
+                <span class="stat-value">{{ user.reviews_received.count }}</span>
+                <span class="text-small" style="color:var(--accent-amber); margin-bottom:4px;">received</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews & Edit Form -->
+    <div class="grid grid-12" style="gap:32px;">
+        <div class="col-span-7 flex flex-col gap-24">
+            <div class="section-header">
+                <h2 class="text-h2">Community Feedback</h2>
+                <span class="text-label" style="color:var(--accent-copper);">Recent</span>
+            </div>
+            {% if user.reviews_received.all %}
+            {% for review in user.reviews_received.all|slice:":3" %}
+            <div class="card">
+                <div class="flex gap-16" style="flex-wrap:wrap;">
+                    <div class="flex flex-col gap-8" style="min-width:160px;">
+                        <div class="flex items-center gap-12">
+                            <div class="avatar avatar-sm">{{ review.reviewer.username|slice:":1"|upper }}</div>
+                            <div>
+                                <div class="font-semibold text-small">{{ review.reviewer.username }}</div>
+                                <div class="text-xs">Rated {{ review.rating }}/5</div>
+                            </div>
+                        </div>
+                        <div class="stars">
+                            {% for i in "12345" %}
+                            <span class="material-symbols-outlined" style="{% if forloop.counter > review.rating %}color:var(--text-muted); font-variation-settings:'FILL' 0;{% endif %}">star</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-body">{{ review.comment }}</p>
+                        <span class="text-xs mt-8" style="display:block;">{{ review.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="card" style="text-align:center; padding:40px;">
+                <p class="text-body">No reviews yet. Complete exchanges to build your reputation.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <aside class="col-span-5">
+            <div class="card sticky top-100">
+                <h3 class="text-h3 mb-24" style="padding-bottom:16px; border-bottom:1px solid var(--border-glass);">Update Profile</h3>
+                <form method="post" enctype="multipart/form-data" class="flex flex-col gap-20">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="form-group">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}
+                        <p class="form-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary btn-block mt-8">Save Changes</button>
+                </form>
+            </div>
+        </aside>
     </div>
 </div>
 {% endblock %}

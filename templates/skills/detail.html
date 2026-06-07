@@ -1,62 +1,70 @@
 {% extends "base.html" %}
 
-{% block title %}{{ skill.title }} - Service{% endblock %}
+{% block title %}{{ skill.title }} – Skill Detail{% endblock %}
 
 {% block content %}
-<div class="container section-py">
-    <!-- Breadcrumb -->
-    <div class="mb-4 text-sm text-muted">
-        <a href="{% url 'skill_list' %}">Marketplace</a> / <span>{{ skill.title }}</span>
-    </div>
-
-    <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 48px;">
-        <!-- Left content -->
-        <div>
-            <h1 style="font-size: 40px; margin-bottom: 24px;">{{ skill.title }}</h1>
-
-            <div class="flex items-center gap-4 mb-4"
-                style="padding-bottom: 24px; border-bottom: 1px solid var(--border-light);">
-                <div
-                    style="width: 48px; height: 48px; background: var(--text-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600;">
+<div class="container">
+    <div class="grid grid-12" style="gap:32px;">
+        <div class="col-span-8 flex flex-col gap-32">
+            <header class="card" style="position:relative; overflow:hidden;">
+                <div style="position:absolute; inset:0; background:linear-gradient(135deg, rgba(212,132,90,0.04), transparent); pointer-events:none;"></div>
+                <div class="flex gap-24 relative z-10" style="flex-wrap:wrap;">
                     {% if skill.user.profile_picture %}
-                    <img src="{{ skill.user.profile_picture.url }}"
-                        style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                    <div class="avatar-xl shrink-0"><img src="{{ skill.user.profile_picture.url }}" alt="{{ skill.user.username }}"></div>
                     {% else %}
-                    {{ skill.user.username|slice:":1"|upper }}
+                    <div class="avatar-xl shrink-0">{{ skill.user.username|slice:":1"|upper }}</div>
                     {% endif %}
+                    <div class="flex-1">
+                        <h1 class="text-h1 mb-8">{{ skill.title }}</h1>
+                        <p class="text-h4 mb-12" style="color:var(--text-secondary); font-weight:400;">{{ skill.user.username }}</p>
+                        <div class="flex items-center gap-8 text-small">
+                            <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
+                            Posted {{ skill.created_at|date:"M d, Y" }}
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <div style="font-weight: 600;">{{ skill.user.username }}</div>
-                    <div class="text-xs text-muted">Posted {{ skill.created_at|date:"M d, Y" }}</div>
+            </header>
+            <section>
+                <h2 class="text-h2 mb-16">About This Skill</h2>
+                <div class="card">
+                    <div class="text-body-lg" style="line-height:1.8;">{{ skill.description|linebreaksbr }}</div>
                 </div>
-            </div>
-
-            <div style="font-size: 18px; line-height: 1.6; color: var(--text-secondary);">
-                {{ skill.description|linebreaksbr }}
-            </div>
+            </section>
+            <section>
+                <h3 class="text-h3 mb-16">Prerequisites</h3>
+                <div class="flex gap-8" style="flex-wrap:wrap;">
+                    <span class="badge" style="background:var(--bg-glass); color:var(--text-secondary); border-color:var(--border-glass); padding:8px 16px; font-size:13px; text-transform:none;">Clear Goals</span>
+                    <span class="badge" style="background:var(--bg-glass); color:var(--text-secondary); border-color:var(--border-glass); padding:8px 16px; font-size:13px; text-transform:none;">Basic Knowledge</span>
+                    <span class="badge" style="background:var(--bg-glass); color:var(--text-secondary); border-color:var(--border-glass); padding:8px 16px; font-size:13px; text-transform:none;">Availability</span>
+                </div>
+            </section>
         </div>
-
-        <!-- Right Sidebar -->
-        <div>
-            <div class="card" style="position: sticky; top: 100px;">
-                <h3 style="font-size: 20px; margin-bottom: 16px;">Request Service</h3>
-                <div class="flex justify-between mb-4 text-sm">
-                    <span class="text-muted">Cost</span>
-                    <span class="font-bold">Negotiable</span>
+        <aside class="col-span-4">
+            <div class="card sticky top-100 flex flex-col gap-20">
+                <div style="padding-bottom:20px; border-bottom:1px solid var(--border-glass);">
+                    <div class="text-label mb-8">Exchange Rate</div>
+                    <div class="flex items-end gap-8">
+                        <span class="text-h1">1</span>
+                        <span class="text-body" style="color:var(--accent-copper); margin-bottom:4px;">Hour / Session</span>
+                    </div>
                 </div>
-
                 {% if user != skill.user %}
-                <a href="{% url 'create_request' skill_id=skill.pk %}" class="btn btn-primary" style="width: 100%;">
-                    Request Now
+                <a href="{% url 'create_request' skill_id=skill.pk %}" class="btn btn-primary btn-block btn-lg">
+                    <span class="material-symbols-outlined">handshake</span> Request Skill
                 </a>
-                <p class="text-xs text-muted text-center mt-2">Uses Time Credits</p>
+                <div style="background:rgba(212,132,90,0.04); border:1px solid rgba(212,132,90,0.1); border-radius:var(--radius-md); padding:16px;" class="flex gap-12 items-start">
+                    <span class="material-symbols-outlined" style="color:var(--accent-copper); margin-top:2px;">shield</span>
+                    <p class="text-small">Your time is held in escrow until the session is completed.</p>
+                </div>
                 {% else %}
-                <a href="{% url 'skill_edit' pk=skill.pk %}" class="btn btn-secondary" style="width: 100%;">
-                    Edit Listing
-                </a>
+                <a href="{% url 'skill_edit' pk=skill.pk %}" class="btn btn-secondary btn-block">Edit Listing</a>
+                <form action="{% url 'skill_delete' pk=skill.pk %}" method="post" onsubmit="return confirm('Delete this listing?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-block">Delete Listing</button>
+                </form>
                 {% endif %}
             </div>
-        </div>
+        </aside>
     </div>
 </div>
 {% endblock %}
