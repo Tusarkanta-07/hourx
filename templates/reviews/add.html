@@ -5,19 +5,39 @@
 {% block content %}
 <div class="container-sm">
     <div class="card">
-        <h2 class="text-h2 mb-8">Review Experience</h2>
-        <p class="text-body mb-32">How was your exchange with <strong style="color:var(--accent-copper);">{{ reviewee.username }}</strong>?</p>
+        <div class="flex items-center gap-12 mb-16">
+            <span class="material-symbols-outlined" style="color:var(--accent-gold); font-size:28px;">rate_review</span>
+            <div>
+                <h2 class="text-h2">Review Exchange</h2>
+                <p class="text-small" style="color:var(--text-secondary);">Verified Transaction Review</p>
+            </div>
+        </div>
+
+        {% if barter_request %}
+        <div style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-md); padding:12px 16px; margin-bottom:24px;">
+            <div class="font-semibold text-body mb-4">{{ barter_request.skill.title }}</div>
+            <div class="text-small flex items-center gap-12" style="color:var(--text-secondary); flex-wrap:wrap;">
+                <span>Exchange with: <strong style="color:var(--accent-copper);">{{ reviewee.username }}</strong></span>
+                <span>•</span>
+                <span>{{ barter_request.hours }} hrs</span>
+                <span>•</span>
+                <span>Completed</span>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-body mb-24">How was your exchange with <strong style="color:var(--accent-copper);">{{ reviewee.username }}</strong>?</p>
+        {% endif %}
 
         <form method="post" class="flex flex-col gap-24">
             {% csrf_token %}
             <div class="form-group">
                 <label class="form-label">Rating</label>
                 <select name="rating" class="form-select">
-                    <option value="5">5 – Excellent</option>
-                    <option value="4">4 – Good</option>
-                    <option value="3">3 – Average</option>
-                    <option value="2">2 – Poor</option>
-                    <option value="1">1 – Terrible</option>
+                    <option value="5">5 ★ – Excellent</option>
+                    <option value="4">4 ★ – Good</option>
+                    <option value="3">3 ★ – Average</option>
+                    <option value="2">2 ★ – Poor</option>
+                    <option value="1">1 ★ – Terrible</option>
                 </select>
             </div>
             <div class="form-group">
@@ -25,7 +45,7 @@
                 <textarea name="comment" rows="4" class="form-textarea" placeholder="Share details about your experience..." required></textarea>
             </div>
             <div class="flex gap-12" style="flex-wrap:wrap;">
-                <a href="{% url 'dashboard' %}" class="btn btn-secondary flex-1">Cancel</a>
+                <a href="{% url 'sent_requests' %}" class="btn btn-secondary flex-1">Cancel</a>
                 <button type="submit" class="btn btn-primary flex-1">Submit Review</button>
             </div>
         </form>

@@ -121,7 +121,11 @@
                     {% endif %}
                     {% elif req.status == 'COMPLETED' %}
                     <a href="{% url 'join_meeting' req.pk %}" class="btn btn-primary btn-sm btn-block">Meeting</a>
-                    <a href="{% url 'add_review' user_id=req.receiver.pk %}" class="btn btn-secondary btn-sm btn-block">Review</a>
+                    {% if req.review %}
+                    <span class="badge badge-completed" style="justify-content:center; font-size:11px;">Reviewed ({{ req.review.rating }}★)</span>
+                    {% else %}
+                    <a href="{% url 'add_review' request_id=req.pk %}" class="btn btn-secondary btn-sm btn-block">Review</a>
+                    {% endif %}
                     {% endif %}
                 </div>
             </div>

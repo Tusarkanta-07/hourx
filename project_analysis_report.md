@@ -81,6 +81,7 @@ erDiagram
     User ||--o{ BarterRequest : "requests cancellation (cancellation_requested_by)"
     User ||--o{ Review : "writes (reviewer)"
     User ||--o{ Review : "receives (reviewee)"
+    BarterRequest ||--o| Review : "bound to (review)"
     Skill ||--o{ BarterRequest : "requested for"
 
     User {
@@ -118,6 +119,7 @@ erDiagram
 
     Review {
         int id PK
+        int barter_request_id FK "unique, OneToOne"
         int reviewer_id FK
         int reviewee_id FK
         int rating "1 to 5"
@@ -128,7 +130,7 @@ erDiagram
 
 ### Key Observations on Models:
 1. **Initial Credit Provision**: A post-signup signal in [`accounts/models.py`](file:///d:/antigravity%20projects/first/hourx/accounts/models.py#L27-L32) (`give_initial_credits`) guarantees that newly registered users receive 5.00 hours of initial credits immediately upon sign-in.
-2. **Review Decoupling**: The [`Review`](file:///d:/antigravity%20projects/first/hourx/reviews/models.py#L5-L14) model is linked directly between `reviewer` and `reviewee`, but **lacks a foreign key to `BarterRequest`**. This prevents the system from verifying that a review corresponds to a distinct completed transaction.
+2. **Review Binding to Transactions**: The [`Review`](file:///d:/antigravity%20projects/first/hourx/reviews/models.py) model is bound to [`BarterRequest`](file:///d:/antigravity%20projects/first/hourx/barter/models.py) via a `OneToOneField`, ensuring each completed barter exchange can receive at most one review and preventing duplicate rating spam.
 
 ---
 
@@ -200,16 +202,18 @@ stateDiagram-v2
 
 ---
 
-### ⚠️ 3. Unconstrained Review Duplication & Lack of Transaction Binding (Medium Severity)
+### ✅ 3. Unconstrained Review Duplication & Lack of Transaction Binding (RESOLVED)
 
-> [!WARNING]
-> **Action Required**: P1 Priority
+> [!NOTE]
+> **Resolution Status**: **FIXED & TESTED**
 
-* **Location**: [`reviews/views.py`](file:///d:/antigravity%20projects/first/hourx/reviews/views.py#L20-L28)
-* **Issue**: The view checks `has_completed_txn = BarterRequest.objects.filter(... status='COMPLETED').exists()`. Once two users have completed a single barter transaction, either user can repeatedly call `POST /reviews/add/<user_id>/` and create an unlimited number of reviews, artificially manipulating reputation scores.
-* **Proposed Remediation**:
-  1. Add `barter_request = models.OneToOneField(BarterRequest, on_delete=models.CASCADE, related_name='review')` to the `Review` model.
-  2. Enforce that each barter request can only be reviewed once.
+* **Location**: [`reviews/models.py`](file:///d:/antigravity%20projects/first/hourx/reviews/models.py) & [`reviews/views.py`](file:///d:/antigravity%20projects/first/hourx/reviews/views.py)
+* **Vulnerability**: Previously, review creation was not tied to specific transactions. Any user with at least one completed exchange could repeatedly submit duplicate reviews to manipulate reputation scores.
+* **Remediation Implemented**:
+  1. **OneToOne Transaction Binding**: Added `barter_request = models.OneToOneField(BarterRequest, on_delete=models.CASCADE, related_name='review')` to [`Review`](file:///d:/antigravity%20projects/first/hourx/reviews/models.py).
+  2. **Transaction Validation**: The `add_review` view now validates that the transaction is `COMPLETED`, that the user was an active participant in that exchange, and that the transaction has not already been reviewed.
+  3. **UI Updates**: Completed exchanges in [`sent_requests.html`](file:///d:/antigravity%20projects/first/hourx/templates/barter/sent_requests.html) and [`received_requests.html`](file:///d:/antigravity%20projects/first/hourx/templates/barter/received_requests.html) now display a `Reviewed (X★)` badge once reviewed instead of permitting duplicate submissions.
+  4. **Automated Tests**: Added comprehensive test suite in [`reviews/tests.py`](file:///d:/antigravity%20projects/first/hourx/reviews/tests.py) verifying duplicate rejection, participant authorization, and completed-status enforcement.
 
 ---
 
@@ -238,9 +242,9 @@ The test suite is executed using `py manage.py test`:
 
 ```
 Creating test database for alias 'default'...
-.................
+........................
 ----------------------------------------------------------------------
-Ran 17 tests in 55.107s
+Ran 24 tests in 44.751s
 
 OK
 Destroying test database for alias 'default'...
@@ -251,9 +255,9 @@ Destroying test database for alias 'default'...
 | Module | Test File | Tests | Coverage Scope |
 | :--- | :--- | :---: | :--- |
 | **Barter Core** | [`barter/tests.py`](file:///d:/antigravity%20projects/first/hourx/barter/tests.py) | **17 Passing** | • Escrow locking & funds deduction<br>• Insufficient funds validation<br>• Escrow release to provider<br>• Row-level lock (`select_for_update`) verification<br>• Multi-request balance race condition prevention<br>• Unilateral sender cancellation prevention<br>• Mutual cancellation initiation & confirmation<br>• Receiver cancellation decline<br>• Sender cancellation withdrawal<br>• Direct receiver forfeit & refund<br>• Unauthorized user protection<br>• View HTTP endpoints (`cancel`, `request`, `confirm`, `withdraw`) |
+| **Reviews** | [`reviews/tests.py`](file:///d:/antigravity%20projects/first/hourx/reviews/tests.py) | **7 Passing** | • OneToOne `barter_request` binding<br>• Duplicate review database integrity enforcement<br>• Successful review submission<br>• Rating spam prevention on same transaction<br>• Uncompleted transaction review rejection<br>• Non-participant authorization check<br>• Invalid rating score validation |
 | **Accounts** | `accounts/tests.py` | 0 | *Pending expansion* |
 | **Skills** | `skills/tests.py` | 0 | *Pending expansion* |
-| **Reviews** | `reviews/tests.py` | 0 | *Pending expansion* |
 
 ---
 
@@ -264,10 +268,10 @@ Destroying test database for alias 'default'...
 | **Resolved** | Code Hygiene | ✅ Done | **Clean Dead Assets & Allauth Fix**: Removed `tailwind.css`, `main.css`, `classlist.txt` and resolved Allauth `account.W001`. | Completed |
 | **Resolved** | Security / Logic | ✅ Done | **Fix Escrow Cancellation**: Prevent unilateral cancellation once request is `ACCEPTED`. Require receiver consent or mutual confirmation. | Completed |
 | **Resolved** | Concurrency | ✅ Done | **Fix Row-Level Lock**: Lock `User` model with `select_for_update()` across all escrow mutations. | Completed |
-| **P1** | Data Integrity | ⏳ Planned | **Bind Reviews to Transactions**: Add `OneToOneField(BarterRequest)` on `Review` model to prevent rating spam. | 1–2 hours |
+| **Resolved** | Data Integrity | ✅ Done | **Bind Reviews to Transactions**: Add `OneToOneField(BarterRequest)` on `Review` model to prevent rating spam. | Completed |
 | **P1** | Video Security | ⏳ Planned | **Secure Jitsi Rooms**: Replace deterministic room names with UUIDv4 cryptographic tokens. | 30 mins |
 | **P2** | Scalability | ⏳ Planned | **Marketplace Pagination**: Add `Paginator` in `skill_list` view and implement real rating filtering. | 1–2 hours |
-| **P3** | Test Coverage | ⏳ Planned | **Expand Test Coverage**: Add unit tests for `accounts`, `skills`, and `reviews` applications. | 3–4 hours |
+| **P3** | Test Coverage | ⏳ Planned | **Expand Test Coverage**: Add unit tests for `accounts` and `skills` applications. | 3–4 hours |
 
 ---
 

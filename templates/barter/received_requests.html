@@ -100,7 +100,11 @@
                     {% endif %}
                     {% elif req.status == 'COMPLETED' %}
                     <a href="{% url 'join_meeting' req.pk %}" class="btn btn-primary btn-sm btn-block">Join Meeting</a>
+                    {% if req.review %}
+                    <span class="badge" style="background:rgba(212,132,90,0.12); color:var(--accent-copper); border-color:rgba(212,132,90,0.3); justify-content:center; font-size:11px;">Rating: {{ req.review.rating }}★</span>
+                    {% else %}
                     <span class="badge badge-completed" style="justify-content:center;">Completed</span>
+                    {% endif %}
                     {% endif %}
                 </div>
             </div>
