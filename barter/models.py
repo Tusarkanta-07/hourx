@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.conf import settings
 from skills.models import Skill
@@ -18,6 +19,7 @@ class BarterRequest(models.Model):
     message = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     is_escrowed = models.BooleanField(default=False)
+    meeting_token = models.UUIDField(default=uuid.uuid4, editable=False, null=True, blank=True)
     cancellation_requested_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,

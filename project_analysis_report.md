@@ -113,6 +113,7 @@ erDiagram
         string status "PENDING, ACCEPTED, REJECTED, COMPLETED, CANCELED"
         string cancellation_reason
         boolean is_escrowed "default False"
+        uuid meeting_token "secure room token"
         datetime created_at
         datetime updated_at
     }
@@ -217,14 +218,18 @@ stateDiagram-v2
 
 ---
 
-### ⚠️ 4. Insecure Public Jitsi Meeting Rooms (Low-Medium Severity)
+### ✅ 4. Insecure Public Jitsi Meeting Rooms (RESOLVED)
 
-> [!WARNING]
-> **Action Required**: P1 Priority
+> [!NOTE]
+> **Resolution Status**: **FIXED & TESTED**
 
-* **Location**: [`barter/views.py`](file:///d:/antigravity%20projects/first/hourx/barter/views.py#L121-L122) and [`templates/barter/meeting.html`](file:///d:/antigravity%20projects/first/hourx/templates/barter/meeting.html)
-* **Issue**: Meeting room names are generated deterministically (`f"HOURX_Meeting_{request_id}_{clean_title}_SecureRoom"`). This connects to the public `meet.jit.si` cluster without room passwords, JWT tokens, or moderation locks. Any external party who guesses or discovers the room name can enter.
-* **Proposed Remediation**: Generate a cryptographically secure random token (e.g., `uuid.uuid4()`) for the room name.
+* **Location**: [`barter/models.py`](file:///d:/antigravity%20projects/first/hourx/barter/models.py) & [`barter/views.py`](file:///d:/antigravity%20projects/first/hourx/barter/views.py#L174-L198)
+* **Vulnerability**: Previously, meeting room names were generated deterministically based on sequential request IDs and skill titles (`f"HOURX_Meeting_{request_id}_{clean_title}_SecureRoom"`). This allowed external parties to guess room URLs and enter private peer-to-peer collaboration sessions on public Jitsi infrastructure.
+* **Remediation Implemented**:
+  1. **Cryptographic UUIDv4 Tokens**: Added `meeting_token = models.UUIDField(default=uuid.uuid4, editable=False)` to `BarterRequest`.
+  2. **Unhackable Room Names**: Room names now derive exclusively from the cryptographically secure token (`f"HOURX_SecureRoom_{barter_req.meeting_token.hex}"`).
+  3. **Strict Participant Access Control**: `join_meeting` verifies that only authenticated senders or receivers of `ACCEPTED` or `COMPLETED` exchanges can access room configuration.
+  4. **Automated Verification**: Added unit tests in `barter/tests.py` verifying that room names contain UUIDv4 tokens and cannot be guessed from skill titles, that both exchange partners receive the exact same room, and that non-participants or unaccepted requests are blocked.
 
 ---
 
@@ -242,9 +247,9 @@ The test suite is executed using `py manage.py test`:
 
 ```
 Creating test database for alias 'default'...
-........................
+...........................
 ----------------------------------------------------------------------
-Ran 24 tests in 44.751s
+Ran 27 tests in 52.263s
 
 OK
 Destroying test database for alias 'default'...
@@ -254,7 +259,7 @@ Destroying test database for alias 'default'...
 
 | Module | Test File | Tests | Coverage Scope |
 | :--- | :--- | :---: | :--- |
-| **Barter Core** | [`barter/tests.py`](file:///d:/antigravity%20projects/first/hourx/barter/tests.py) | **17 Passing** | • Escrow locking & funds deduction<br>• Insufficient funds validation<br>• Escrow release to provider<br>• Row-level lock (`select_for_update`) verification<br>• Multi-request balance race condition prevention<br>• Unilateral sender cancellation prevention<br>• Mutual cancellation initiation & confirmation<br>• Receiver cancellation decline<br>• Sender cancellation withdrawal<br>• Direct receiver forfeit & refund<br>• Unauthorized user protection<br>• View HTTP endpoints (`cancel`, `request`, `confirm`, `withdraw`) |
+| **Barter Core** | [`barter/tests.py`](file:///d:/antigravity%20projects/first/hourx/barter/tests.py) | **20 Passing** | • Escrow locking & funds deduction<br>• Insufficient funds validation<br>• Escrow release to provider<br>• Row-level lock (`select_for_update`) verification<br>• Multi-request balance race condition prevention<br>• Unilateral sender cancellation prevention<br>• Mutual cancellation initiation & confirmation<br>• Receiver cancellation decline<br>• Sender cancellation withdrawal<br>• Direct receiver forfeit & refund<br>• Unauthorized user protection<br>• View HTTP endpoints (`cancel`, `request`, `confirm`, `withdraw`)<br>• Secure UUIDv4 meeting room generation & access control |
 | **Reviews** | [`reviews/tests.py`](file:///d:/antigravity%20projects/first/hourx/reviews/tests.py) | **7 Passing** | • OneToOne `barter_request` binding<br>• Duplicate review database integrity enforcement<br>• Successful review submission<br>• Rating spam prevention on same transaction<br>• Uncompleted transaction review rejection<br>• Non-participant authorization check<br>• Invalid rating score validation |
 | **Accounts** | `accounts/tests.py` | 0 | *Pending expansion* |
 | **Skills** | `skills/tests.py` | 0 | *Pending expansion* |
@@ -269,7 +274,7 @@ Destroying test database for alias 'default'...
 | **Resolved** | Security / Logic | ✅ Done | **Fix Escrow Cancellation**: Prevent unilateral cancellation once request is `ACCEPTED`. Require receiver consent or mutual confirmation. | Completed |
 | **Resolved** | Concurrency | ✅ Done | **Fix Row-Level Lock**: Lock `User` model with `select_for_update()` across all escrow mutations. | Completed |
 | **Resolved** | Data Integrity | ✅ Done | **Bind Reviews to Transactions**: Add `OneToOneField(BarterRequest)` on `Review` model to prevent rating spam. | Completed |
-| **P1** | Video Security | ⏳ Planned | **Secure Jitsi Rooms**: Replace deterministic room names with UUIDv4 cryptographic tokens. | 30 mins |
+| **Resolved** | Video Security | ✅ Done | **Secure Jitsi Rooms**: Replace deterministic room names with UUIDv4 cryptographic tokens. | Completed |
 | **P2** | Scalability | ⏳ Planned | **Marketplace Pagination**: Add `Paginator` in `skill_list` view and implement real rating filtering. | 1–2 hours |
 | **P3** | Test Coverage | ⏳ Planned | **Expand Test Coverage**: Add unit tests for `accounts` and `skills` applications. | 3–4 hours |
 

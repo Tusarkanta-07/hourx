@@ -184,11 +184,14 @@ def join_meeting(request, request_id):
         messages.error(request, "Meeting is only available for accepted or completed requests.")
         return redirect('skill_list')
 
-    # Generate a unique and private meeting room name
-    # Using the request ID and the skill title stripped of non-alphanumeric characters
-    import re
-    clean_title = re.sub(r'\W+', '', barter_req.skill.title)
-    meeting_room_name = f"HOURX_Meeting_{request_id}_{clean_title}_SecureRoom"
+    # Ensure a cryptographically secure UUIDv4 meeting token is present
+    if not barter_req.meeting_token:
+        import uuid
+        barter_req.meeting_token = uuid.uuid4()
+        barter_req.save(update_fields=['meeting_token'])
+
+    # Cryptographically secure unguessable room name using UUIDv4 token
+    meeting_room_name = f"HOURX_SecureRoom_{barter_req.meeting_token.hex}"
 
     return render(request, 'barter/meeting.html', {
         'request_obj': barter_req,

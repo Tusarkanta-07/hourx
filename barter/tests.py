@@ -255,3 +255,37 @@ class BarterViewsTest(TestCase):
         self.assertFalse(self.request.is_cancellation_pending)
         self.assertEqual(self.request.status, 'ACCEPTED')
 
+    def test_join_meeting_generates_secure_uuid_room_name(self):
+        services.lock_escrow(self.request.id)
+        self.request.refresh_from_db()
+
+        self.client.login(username='sender_user', password='password123')
+        res_sender = self.client.get(f'/barter/meeting/{self.request.id}/')
+        self.assertEqual(res_sender.status_code, 200)
+
+        # Room name must contain the UUIDv4 token and NOT be deterministic based on title
+        room_name_sender = res_sender.context['meeting_room_name']
+        self.assertIn(self.request.meeting_token.hex, room_name_sender)
+        self.assertNotIn("WebDev", room_name_sender)
+
+        # Receiver joining must receive the exact same secure room
+        self.client.login(username='receiver_user', password='password123')
+        res_receiver = self.client.get(f'/barter/meeting/{self.request.id}/')
+        self.assertEqual(res_receiver.status_code, 200)
+        room_name_receiver = res_receiver.context['meeting_room_name']
+        self.assertEqual(room_name_sender, room_name_receiver)
+
+    def test_join_meeting_unauthorized_user_blocked(self):
+        services.lock_escrow(self.request.id)
+        intruder = User.objects.create_user(username='intruder_user', password='password123', time_balance=0.0)
+        self.client.login(username='intruder_user', password='password123')
+        res = self.client.get(f'/barter/meeting/{self.request.id}/')
+        self.assertRedirects(res, '/skills/')
+
+    def test_join_meeting_pending_request_blocked(self):
+        # Request is still PENDING
+        self.client.login(username='sender_user', password='password123')
+        res = self.client.get(f'/barter/meeting/{self.request.id}/')
+        self.assertRedirects(res, '/skills/')
+
+
