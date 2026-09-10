@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Avg, Count, Q
 from .models import Skill
 from django import forms
 
@@ -9,21 +11,48 @@ class SkillForm(forms.ModelForm):
         fields = ['title', 'description', 'category']
 
 def skill_list(request):
-    query = request.GET.get('q')
+    query = request.GET.get('q', '').strip()
     selected_categories = request.GET.getlist('category')
-    skills = Skill.objects.all().order_by('-created_at')
+    min_rating = request.GET.get('min_rating', '').strip()
+
+    skills = Skill.objects.select_related('user').annotate(
+        avg_rating=Avg('user__reviews_received__rating'),
+        review_count=Count('user__reviews_received')
+    ).order_by('-created_at')
     
     if query:
-        skills = skills.filter(title__icontains=query) | skills.filter(description__icontains=query)
-        skills = skills.distinct()
+        skills = skills.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(user__username__icontains=query)
+        ).distinct()
         
     if selected_categories:
         skills = skills.filter(category__in=selected_categories)
 
+    if min_rating:
+        try:
+            min_rating_val = float(min_rating)
+            skills = skills.filter(avg_rating__gte=min_rating_val)
+        except ValueError:
+            pass
+
+    # Pagination: 9 skills per page for 3x3 grid
+    paginator = Paginator(skills, 9)
+    page = request.GET.get('page', 1)
+    try:
+        skills_page = paginator.page(page)
+    except PageNotAnInteger:
+        skills_page = paginator.page(1)
+    except EmptyPage:
+        skills_page = paginator.page(paginator.num_pages)
+
     return render(request, 'skills/list.html', {
-        'skills': skills,
+        'skills': skills_page,
         'query': query,
-        'selected_categories': selected_categories
+        'selected_categories': selected_categories,
+        'min_rating': min_rating,
+        'total_skills': paginator.count,
     })
 
 def skill_detail(request, pk):
