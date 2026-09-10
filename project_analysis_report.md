@@ -1,17 +1,34 @@
 # ⏳ HourX — Comprehensive Project Analysis & Technical Audit Report
 
-**Date**: September 10, 2026  
-**Project**: HourX (Peer-to-Peer Time Bartering Platform)  
-**Repository**: [hourx](file:///d:/antigravity%20projects/first/hourx)  
-**Tech Stack**: Python 3.14, Django 6.0.1, SQLite, Django-Allauth, Vanilla CSS ("Celestial Noir"), Jitsi Meet WebRTC  
+| Attribute | Details |
+| :--- | :--- |
+| **Project** | **HourX** — Peer-to-Peer Time Bartering Platform |
+| **Repository** | [`hourx`](file:///d:/antigravity%20projects/first/hourx) |
+| **Tech Stack** | Python 3.14 · Django 6.0.1 · SQLite · Django-Allauth · Celestial Noir Design System · Jitsi Meet WebRTC |
+| **Audit Date** | September 10, 2026 |
+| **Audit Status** | **Core P0 Critical Vulnerabilities Resolved** ✅ |
 
 ---
 
 ## 1. Executive Summary
 
-**HourX** is a decentralized peer-to-peer time-credit bartering marketplace built on Django 6.0. Users exchange their skills (Development, Design, Writing, Music) without fiat currency using **Time Credits** (hours) as a medium of exchange. The platform incorporates a local escrow system to hold hours during an active transaction, an embedded Jitsi Meet videoconferencing interface for real-time collaboration, a reputation review system, and a dark glassmorphic design language dubbed the "Celestial Noir Design System".
+**HourX** is a decentralized peer-to-peer time-credit bartering marketplace built on Django 6.0. Users exchange their skills (Development, Design, Writing, Music) without fiat currency using **Time Credits** (hours) as a medium of exchange. The platform incorporates:
+- A secure local escrow system to lock hours during active exchanges.
+- Embedded Jitsi Meet videoconferencing for real-time collaboration.
+- A peer rating and review reputation loop.
+- A dark glassmorphic design language dubbed the *"Celestial Noir Design System"*.
 
 The architecture prioritizes a frictionless user experience with third-party social authentication (Google, GitHub, Discord, LinkedIn) and instant onboarding. Our audit identified key areas for enhancement, primarily centered on **escrow transaction security**, **balance concurrency controls**, and **reputation integrity**.
+
+### System Health Snapshot
+
+| Metric / Component | Status | Details |
+| :--- | :---: | :--- |
+| **Escrow Engine** | 🛡️ Secured | Unilateral cancellation prevented; mutual confirmation & receiver consent enforced |
+| **Balance Concurrency** | 🔒 Protected | Row-level locking (`select_for_update`) applied to sender & receiver balances |
+| **Authentication** | ⚡ Active | Google, GitHub, Discord, LinkedIn OAuth2 via `django-allauth` |
+| **Collaboration** | 📹 Embedded | Private Jitsi Meet rooms per active barter exchange |
+| **Test Suite** | ✅ 17/17 Passing | 100% pass rate across core escrow services and barter views |
 
 ---
 
@@ -23,6 +40,12 @@ The architecture prioritizes a frictionless user experience with third-party soc
 hourx/
 ├── accounts/               # Custom user model, dashboard, profile, social auth adapters
 ├── barter/                 # Barter transaction lifecycle, escrow engine, Jitsi meet integration
+│   ├── migrations/         # Schema migrations (including cancellation fields)
+│   ├── models.py           # BarterRequest entity & status choices
+│   ├── services.py         # Transactional escrow engine & mutual confirmation protocol
+│   ├── tests.py            # Unit & integration test suite (17 tests)
+│   ├── urls.py             # Barter routing endpoints
+│   └── views.py            # Exchange management & room access controllers
 ├── skills/                 # Skill listings, marketplace browsing, skill CRUD
 ├── reviews/                # 1-to-5 star rating & feedback loop
 ├── hourx/                  # Core Django project config (settings, URLs, WSGI, ASGI)
@@ -55,6 +78,7 @@ erDiagram
     User ||--o{ Skill : "offers"
     User ||--o{ BarterRequest : "sends (sender)"
     User ||--o{ BarterRequest : "receives (receiver)"
+    User ||--o{ BarterRequest : "requests cancellation (cancellation_requested_by)"
     User ||--o{ Review : "writes (reviewer)"
     User ||--o{ Review : "receives (reviewee)"
     Skill ||--o{ BarterRequest : "requested for"
@@ -82,9 +106,11 @@ erDiagram
         int sender_id FK
         int receiver_id FK
         int skill_id FK
+        int cancellation_requested_by_id FK "nullable"
         int hours "default 1"
         text message
         string status "PENDING, ACCEPTED, REJECTED, COMPLETED, CANCELED"
+        string cancellation_reason
         boolean is_escrowed "default False"
         datetime created_at
         datetime updated_at
@@ -102,7 +128,7 @@ erDiagram
 
 ### Key Observations on Models:
 1. **Initial Credit Provision**: A post-signup signal in [`accounts/models.py`](file:///d:/antigravity%20projects/first/hourx/accounts/models.py#L27-L32) (`give_initial_credits`) guarantees that newly registered users receive 5.00 hours of initial credits immediately upon sign-in.
-2. **Review Decoupling**: The [`Review`](file:///d:/antigravity%20projects/first/hourx/reviews/models.py#L5-L14) model is linked directly between `reviewer` and `reviewee`, but **lacks a foreign key to `BarterRequest`**. This prevents the system from verifying that a review corresponds to a distinct transaction.
+2. **Review Decoupling**: The [`Review`](file:///d:/antigravity%20projects/first/hourx/reviews/models.py#L5-L14) model is linked directly between `reviewer` and `reviewee`, but **lacks a foreign key to `BarterRequest`**. This prevents the system from verifying that a review corresponds to a distinct completed transaction.
 
 ---
 
@@ -117,19 +143,24 @@ stateDiagram-v2
     PENDING --> CANCELED: Sender cancels (no balance change)
     PENDING --> ACCEPTED: Receiver accepts (services.lock_escrow)
     note right of ACCEPTED
-        Sender's time_balance is deducted
-        is_escrowed = True
-        Jitsi room unlocked
+        • Sender balance locked & deducted
+        • is_escrowed = True
+        • Private Jitsi room unlocked
     end note
     ACCEPTED --> COMPLETED: Sender confirms completion (services.release_escrow)
     note right of COMPLETED
-        Receiver's time_balance is credited
-        is_escrowed = False
+        • Receiver balance credited
+        • is_escrowed = False
     end note
-    ACCEPTED --> CANCELED: Sender cancels (services.cancel_request)
+    ACCEPTED --> ACCEPTED: Cancellation Requested (services.request_cancellation)
+    note right of ACCEPTED
+        • Awaiting counterparty consent
+        • Escrow remains securely held
+    end note
+    ACCEPTED --> CANCELED: Receiver consents or Provider cancels (services.confirm_cancellation / cancel_request)
     note right of CANCELED
-        CRITICAL VULNERABILITY:
-        Sender gets full refund unilaterally!
+        • Sender refunded 100% of escrow
+        • is_escrowed = False
     end note
     COMPLETED --> [*]
     REJECTED --> [*]
@@ -138,55 +169,63 @@ stateDiagram-v2
 
 ---
 
-## 5. Critical Vulnerabilities & Architectural Flaws
+## 5. Security Audit & Findings
 
 ### ✅ 1. Unilateral Sender Cancellation Exploit (RESOLVED)
+
+> [!NOTE]
+> **Resolution Status**: **FIXED & TESTED**
+
 * **Location**: [`barter/services.py`](file:///d:/antigravity%20projects/first/hourx/barter/services.py) & [`barter/views.py`](file:///d:/antigravity%20projects/first/hourx/barter/views.py)
-* **Issue**: Previously, in `cancel_request()`, when a request was in `ACCEPTED` state, the sender could unilaterally cancel at any time and get an immediate refund without receiver consent.
-* **Resolution**: 
-  - Unilateral cancellation by the sender on `ACCEPTED` requests is blocked and raises a `ValidationError`.
-  - Added mutual confirmation and receiver consent protocol:
-    - Sender can submit a cancellation request with optional reason (`services.request_cancellation`).
-    - Receiver must approve/consent (`services.confirm_cancellation`) to finalize cancellation and refund escrow.
-    - Receiver (provider) can also voluntarily cancel and release refund to sender directly.
-    - Either party can withdraw or decline a cancellation request (`services.withdraw_cancellation`).
-    - Sender balance row is safely locked with `select_for_update()`.
-  - UI updated across sent requests, received requests, dashboard, and legal/support documentation.
+* **Vulnerability**: Previously, in `cancel_request()`, when a request was in `ACCEPTED` state, the sender could unilaterally cancel at any time and receive an immediate 100% refund without receiver consent, leaving the service provider unpaid.
+* **Remediation Implemented**:
+  1. **Blocked Unilateral Cancellation**: Senders cannot cancel accepted requests unilaterally (`ValidationError` raised).
+  2. **Mutual Confirmation Flow**: Senders can submit a cancellation request with reason (`services.request_cancellation`).
+  3. **Receiver Consent**: Receivers can approve/consent to refund sender (`services.confirm_cancellation`) or decline to keep exchange active (`services.withdraw_cancellation`).
+  4. **Voluntary Provider Forfeit**: Providers can directly cancel and refund sender if unable to deliver.
+  5. **UI & Templates**: Integrated modals, status badges, and action buttons in [`sent_requests.html`](file:///d:/antigravity%20projects/first/hourx/templates/barter/sent_requests.html), [`received_requests.html`](file:///d:/antigravity%20projects/first/hourx/templates/barter/received_requests.html), and [`dashboard/index.html`](file:///d:/antigravity%20projects/first/hourx/templates/dashboard/index.html).
 
 ---
 
 ### ✅ 2. Balance Concurrency & Race Condition on Escrow Lock (RESOLVED)
+
+> [!NOTE]
+> **Resolution Status**: **FIXED & TESTED**
+
 * **Location**: [`barter/services.py`](file:///d:/antigravity%20projects/first/hourx/barter/services.py#L8-L30)
-* **Issue**: Previously, `BarterRequest` was locked via `select_for_update()`, but `sender` was fetched without row-locking. Concurrent requests could read stale balance values and cause race conditions or negative balances.
-* **Resolution**: Locked the user row directly inside atomic transaction:
-  ```python
-  sender = User.objects.select_for_update().get(id=barter_request.sender_id)
-  ```
-  Verified with unit tests `test_lock_escrow_uses_select_for_update_on_user` and `test_lock_escrow_multiple_requests_exceeding_balance`. Row-level locks were also added to `release_escrow`, `cancel_request`, and `confirm_cancellation`.
+* **Vulnerability**: `BarterRequest` was locked via `select_for_update()`, but the sender `User` record was read without row-locking. If multiple pending requests were accepted simultaneously, concurrent workers could overdraw balance into negatives.
+* **Remediation Implemented**:
+  1. **Row-Level Locking**: Enforced `User.objects.select_for_update().get(id=...)` inside atomic transaction blocks in `lock_escrow`, `release_escrow`, `cancel_request`, and `confirm_cancellation`.
+  2. **Automated Verification**: Added unit tests `test_lock_escrow_uses_select_for_update_on_user` and `test_lock_escrow_multiple_requests_exceeding_balance`.
 
 ---
 
 ### ⚠️ 3. Unconstrained Review Duplication & Lack of Transaction Binding (Medium Severity)
+
+> [!WARNING]
+> **Action Required**: P1 Priority
+
 * **Location**: [`reviews/views.py`](file:///d:/antigravity%20projects/first/hourx/reviews/views.py#L20-L28)
-* **Issue**: The view checks `has_completed_txn = BarterRequest.objects.filter(... status='COMPLETED').exists()`. Once two users have completed a single barter transaction, either user can repeatedly call `POST /reviews/add/<user_id>/` and create an unlimited number of 5-star (or 1-star) reviews, artificially manipulating reputation scores.
-* **Remediation**:
+* **Issue**: The view checks `has_completed_txn = BarterRequest.objects.filter(... status='COMPLETED').exists()`. Once two users have completed a single barter transaction, either user can repeatedly call `POST /reviews/add/<user_id>/` and create an unlimited number of reviews, artificially manipulating reputation scores.
+* **Proposed Remediation**:
   1. Add `barter_request = models.OneToOneField(BarterRequest, on_delete=models.CASCADE, related_name='review')` to the `Review` model.
   2. Enforce that each barter request can only be reviewed once.
 
 ---
 
 ### ⚠️ 4. Insecure Public Jitsi Meeting Rooms (Low-Medium Severity)
+
+> [!WARNING]
+> **Action Required**: P1 Priority
+
 * **Location**: [`barter/views.py`](file:///d:/antigravity%20projects/first/hourx/barter/views.py#L121-L122) and [`templates/barter/meeting.html`](file:///d:/antigravity%20projects/first/hourx/templates/barter/meeting.html)
-* **Issue**: Meeting rooms are generated using:
-  ```python
-  meeting_room_name = f"HOURX_Meeting_{request_id}_{clean_title}_SecureRoom"
-  ```
-  This room name is completely predictable. It connects to the public `meet.jit.si` cluster without room passwords, JWT tokens, or moderation locks. Any external party who knows the URL can join the room.
-* **Remediation**: Generate a cryptographically secure random token (e.g., `uuid.uuid4()`) for the room name.
+* **Issue**: Meeting room names are generated deterministically (`f"HOURX_Meeting_{request_id}_{clean_title}_SecureRoom"`). This connects to the public `meet.jit.si` cluster without room passwords, JWT tokens, or moderation locks. Any external party who guesses or discovers the room name can enter.
+* **Proposed Remediation**: Generate a cryptographically secure random token (e.g., `uuid.uuid4()`) for the room name.
 
 ---
 
 ### ⚠️ 5. Configuration & Code Quality
+
 * **Hardcoded Domain**: [`accounts/management/commands/setup_social_apps.py`](file:///d:/antigravity%20projects/first/hourx/accounts/management/commands/setup_social_apps.py#L24) hardcodes `domain = 'testpythontusar.pythonanywhere.com'`. This should accept an argument or read from `ALLOWED_HOSTS`.
 * **Missing Pagination**: [`skills/views.py`](file:///d:/antigravity%20projects/first/hourx/skills/views.py#L14) loads all skills into memory at once (`Skill.objects.all()`).
 * **Non-Functional UI Filter**: The "Minimum Rating" star component on the marketplace sidebar ([`templates/skills/list.html`](file:///d:/antigravity%20projects/first/hourx/templates/skills/list.html#L39-L48)) is static markup without form inputs or view filtering.
@@ -195,31 +234,45 @@ stateDiagram-v2
 
 ## 6. Test Suite & Verification Analysis
 
-* **Test Suite**: Run with `py -3 manage.py test`.
-* **Current Result**: 6 tests passed.
-* **Test Coverage**:
-  * [`barter/tests.py`](file:///d:/antigravity%20projects/first/hourx/barter/tests.py): Covers `lock_escrow`, `lock_escrow_insufficient_funds`, `release_escrow`, `reject_request`, `cancel_pending_request`, `cancel_accepted_request`.
-  * `accounts/tests.py`: Empty file (0 tests).
-  * `skills/tests.py`: Empty file (0 tests).
-  * `reviews/tests.py`: Empty file (0 tests).
-* **Overall Test Coverage**: < 20% of codebase.
+The test suite is executed using `py manage.py test`:
+
+```
+Creating test database for alias 'default'...
+.................
+----------------------------------------------------------------------
+Ran 17 tests in 55.107s
+
+OK
+Destroying test database for alias 'default'...
+```
+
+### Test Coverage Breakdown
+
+| Module | Test File | Tests | Coverage Scope |
+| :--- | :--- | :---: | :--- |
+| **Barter Core** | [`barter/tests.py`](file:///d:/antigravity%20projects/first/hourx/barter/tests.py) | **17 Passing** | • Escrow locking & funds deduction<br>• Insufficient funds validation<br>• Escrow release to provider<br>• Row-level lock (`select_for_update`) verification<br>• Multi-request balance race condition prevention<br>• Unilateral sender cancellation prevention<br>• Mutual cancellation initiation & confirmation<br>• Receiver cancellation decline<br>• Sender cancellation withdrawal<br>• Direct receiver forfeit & refund<br>• Unauthorized user protection<br>• View HTTP endpoints (`cancel`, `request`, `confirm`, `withdraw`) |
+| **Accounts** | `accounts/tests.py` | 0 | *Pending expansion* |
+| **Skills** | `skills/tests.py` | 0 | *Pending expansion* |
+| **Reviews** | `reviews/tests.py` | 0 | *Pending expansion* |
 
 ---
 
 ## 7. Prioritized Remediation Roadmap
 
-| Priority | Category | Action Item | Estimated Effort |
-| :--- | :--- | :--- | :--- |
-| **Resolved** | Code Hygiene | **Clean Dead Assets & Allauth Fix**: Removed `tailwind.css`, `main.css`, `classlist.txt` and resolved Allauth `account.W001` (committed & pushed). | Completed |
-| **Resolved** | Security / Logic | **Fix Escrow Cancellation**: Prevent unilateral cancellation once request is `ACCEPTED`. Require receiver consent or mutual confirmation. | Completed |
-| **Resolved** | Concurrency | **Fix Row-Level Lock**: Lock `User` model with `select_for_update()` in `lock_escrow()`. | Completed |
-| **P1 (High)** | Data Integrity | **Bind Reviews to Transactions**: Add `OneToOneField(BarterRequest)` on `Review` model to stop rating spam. | 1-2 hours |
-| **P1 (High)** | Video Security | **Secure Jitsi Rooms**: Replace deterministic room names with UUIDv4 tokens. | 30 mins |
-| **P2 (Medium)** | Scalability | **Marketplace Pagination**: Add `Paginator` in `skill_list` view and implement real rating filtering. | 1-2 hours |
-| **P3 (Low)** | Testing | **Expand Test Coverage**: Add unit tests for `accounts`, `skills`, and `reviews` views. | 3-4 hours |
+| Priority | Category | Status | Action Item | Estimated Effort |
+| :---: | :--- | :---: | :--- | :---: |
+| **Resolved** | Code Hygiene | ✅ Done | **Clean Dead Assets & Allauth Fix**: Removed `tailwind.css`, `main.css`, `classlist.txt` and resolved Allauth `account.W001`. | Completed |
+| **Resolved** | Security / Logic | ✅ Done | **Fix Escrow Cancellation**: Prevent unilateral cancellation once request is `ACCEPTED`. Require receiver consent or mutual confirmation. | Completed |
+| **Resolved** | Concurrency | ✅ Done | **Fix Row-Level Lock**: Lock `User` model with `select_for_update()` across all escrow mutations. | Completed |
+| **P1** | Data Integrity | ⏳ Planned | **Bind Reviews to Transactions**: Add `OneToOneField(BarterRequest)` on `Review` model to prevent rating spam. | 1–2 hours |
+| **P1** | Video Security | ⏳ Planned | **Secure Jitsi Rooms**: Replace deterministic room names with UUIDv4 cryptographic tokens. | 30 mins |
+| **P2** | Scalability | ⏳ Planned | **Marketplace Pagination**: Add `Paginator` in `skill_list` view and implement real rating filtering. | 1–2 hours |
+| **P3** | Test Coverage | ⏳ Planned | **Expand Test Coverage**: Add unit tests for `accounts`, `skills`, and `reviews` applications. | 3–4 hours |
 
 ---
 
 ## 8. Conclusion
 
-HourX is a thoughtfully conceived and visually compelling application. Its core escrow architecture and UI theme ("Celestial Noir") demonstrate substantial effort and strong aesthetic execution. By addressing the critical escrow cancellation vulnerability, adding balance row-locking, and binding reviews directly to barter transactions, HourX will be a robust, secure, and production-ready time-exchange platform.
+HourX is a thoughtfully conceived and visually compelling application. Its core escrow architecture and UI theme (*"Celestial Noir"*) demonstrate substantial effort and strong aesthetic execution. 
+
+With the resolution of the **critical escrow cancellation vulnerability** and the introduction of **row-level balance locks**, HourX's financial core is robust, fraud-resistant, and concurrency-safe. Addressing the remaining items (transaction-bound reviews and secure meeting room tokens) will elevate HourX to a production-grade time-exchange economy.
