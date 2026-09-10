@@ -144,7 +144,7 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 
 
 # Allauth configuration
-ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 SOCIALACCOUNT_AUTO_SIGNUP = True
