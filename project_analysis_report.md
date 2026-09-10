@@ -155,23 +155,14 @@ stateDiagram-v2
 
 ---
 
-### 🚨 2. Balance Concurrency & Race Condition on Escrow Lock (Medium-High Severity)
-* **Location**: [`barter/services.py`](file:///d:/antigravity%20projects/first/hourx/barter/services.py#L9-L26)
-* **Issue**:
-  ```python
-  with transaction.atomic():
-      barter_request = BarterRequest.objects.select_for_update().get(id=request_id)
-      sender = barter_request.sender
-      if sender.time_balance < barter_request.hours:
-          raise ValidationError(...)
-      sender.time_balance -= barter_request.hours
-      sender.save()
-  ```
-  `BarterRequest` is locked via `select_for_update()`, but **`sender` is not locked**. If a user with 5 hours has two pending requests accepted simultaneously by two different providers, both worker processes read `sender.time_balance = 5`, pass the check, deduct 5, and result in a negative balance or lost updates.
-* **Remediation**: Lock the user row directly:
+### ✅ 2. Balance Concurrency & Race Condition on Escrow Lock (RESOLVED)
+* **Location**: [`barter/services.py`](file:///d:/antigravity%20projects/first/hourx/barter/services.py#L8-L30)
+* **Issue**: Previously, `BarterRequest` was locked via `select_for_update()`, but `sender` was fetched without row-locking. Concurrent requests could read stale balance values and cause race conditions or negative balances.
+* **Resolution**: Locked the user row directly inside atomic transaction:
   ```python
   sender = User.objects.select_for_update().get(id=barter_request.sender_id)
   ```
+  Verified with unit tests `test_lock_escrow_uses_select_for_update_on_user` and `test_lock_escrow_multiple_requests_exceeding_balance`. Row-level locks were also added to `release_escrow`, `cancel_request`, and `confirm_cancellation`.
 
 ---
 
@@ -221,7 +212,7 @@ stateDiagram-v2
 | :--- | :--- | :--- | :--- |
 | **Resolved** | Code Hygiene | **Clean Dead Assets & Allauth Fix**: Removed `tailwind.css`, `main.css`, `classlist.txt` and resolved Allauth `account.W001` (committed & pushed). | Completed |
 | **Resolved** | Security / Logic | **Fix Escrow Cancellation**: Prevent unilateral cancellation once request is `ACCEPTED`. Require receiver consent or mutual confirmation. | Completed |
-| **P0 (Critical)** | Concurrency | **Fix Row-Level Lock**: Lock `User` model with `select_for_update()` in `lock_escrow()`. | 30 mins |
+| **Resolved** | Concurrency | **Fix Row-Level Lock**: Lock `User` model with `select_for_update()` in `lock_escrow()`. | Completed |
 | **P1 (High)** | Data Integrity | **Bind Reviews to Transactions**: Add `OneToOneField(BarterRequest)` on `Review` model to stop rating spam. | 1-2 hours |
 | **P1 (High)** | Video Security | **Secure Jitsi Rooms**: Replace deterministic room names with UUIDv4 tokens. | 30 mins |
 | **P2 (Medium)** | Scalability | **Marketplace Pagination**: Add `Paginator` in `skill_list` view and implement real rating filtering. | 1-2 hours |

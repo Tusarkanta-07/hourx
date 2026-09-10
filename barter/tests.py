@@ -31,6 +31,27 @@ class BarterServicesTest(TestCase):
         self.assertEqual(self.request.status, 'ACCEPTED')
         self.assertTrue(self.request.is_escrowed)
 
+    def test_lock_escrow_uses_select_for_update_on_user(self):
+        from unittest.mock import patch
+        with patch.object(User.objects, 'select_for_update', wraps=User.objects.select_for_update) as mock_sfu:
+            services.lock_escrow(self.request.id)
+            self.assertTrue(mock_sfu.called)
+
+    def test_lock_escrow_multiple_requests_exceeding_balance(self):
+        req1 = BarterRequest.objects.create(
+            sender=self.sender, receiver=self.receiver, skill=self.skill, hours=6, status='PENDING'
+        )
+        req2 = BarterRequest.objects.create(
+            sender=self.sender, receiver=self.receiver, skill=self.skill, hours=6, status='PENDING'
+        )
+        services.lock_escrow(req1.id)
+        self.sender.refresh_from_db()
+        self.assertEqual(self.sender.time_balance, 4.0)
+
+        with self.assertRaises(ValidationError) as ctx:
+            services.lock_escrow(req2.id)
+        self.assertIn("Sender does not have enough time balance", str(ctx.exception))
+
     def test_lock_escrow_insufficient_funds(self):
         # Change sender balance
         self.sender.time_balance = 1.0
