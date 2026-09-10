@@ -31,15 +31,94 @@
                         </span>
                         <span class="text-xs">{{ req.created_at|date:"M d, Y" }}</span>
                     </div>
-                    <span class="badge {% if req.status == 'PENDING' %}badge-pending{% elif req.status == 'ACCEPTED' %}badge-accepted{% elif req.status == 'COMPLETED' %}badge-completed{% elif req.status == 'REJECTED' %}badge-rejected{% else %}badge-canceled{% endif %}">{{ req.get_status_display }}</span>
+                    <div class="flex items-center gap-8" style="flex-wrap:wrap;">
+                        <span class="badge {% if req.status == 'PENDING' %}badge-pending{% elif req.status == 'ACCEPTED' %}badge-accepted{% elif req.status == 'COMPLETED' %}badge-completed{% elif req.status == 'REJECTED' %}badge-rejected{% else %}badge-canceled{% endif %}">{{ req.get_status_display }}</span>
+                        {% if req.is_cancellation_pending %}
+                        <span class="badge" style="background:rgba(212,132,90,0.15); color:var(--accent-copper); border-color:rgba(212,132,90,0.35);">
+                            <span class="material-symbols-outlined" style="font-size:12px;">hourglass_top</span> Cancellation Pending
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if req.status == 'ACCEPTED' and req.cancellation_requested_by %}
+                        {% if req.cancellation_requested_by == request.user %}
+                        <div style="background:rgba(212,132,90,0.1); border:1px solid rgba(212,132,90,0.3); border-radius:var(--radius-md); padding:10px 14px; margin-top:12px;">
+                            <div class="flex items-center gap-8 text-small" style="color:var(--accent-amber);">
+                                <span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span>
+                                <span><strong>Cancellation Requested:</strong> Awaiting {{ req.receiver.username }}'s consent. Escrow remains secured.</span>
+                            </div>
+                            {% if req.cancellation_reason %}
+                            <p class="text-xs mt-4" style="color:var(--text-secondary);">Reason: "{{ req.cancellation_reason }}"</p>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <div style="background:rgba(244,63,94,0.1); border:1px solid rgba(244,63,94,0.3); border-radius:var(--radius-md); padding:10px 14px; margin-top:12px;">
+                            <div class="flex items-center gap-8 text-small" style="color:var(--accent-rose);">
+                                <span class="material-symbols-outlined" style="font-size:18px;">warning</span>
+                                <span><strong>{{ req.receiver.username }}</strong> requested to cancel this exchange.</span>
+                            </div>
+                            {% if req.cancellation_reason %}
+                            <p class="text-xs mt-4" style="color:var(--text-secondary);">Reason: "{{ req.cancellation_reason }}"</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    {% endif %}
                 </div>
                 <div class="flex flex-col gap-8 shrink-0" style="min-width:140px;">
                     {% if req.status == 'PENDING' %}
                     <form action="{% url 'cancel_request' req.pk %}" method="post" onsubmit="return confirm('Cancel this request?');">{% csrf_token %}<button type="submit" class="btn btn-danger btn-sm btn-block">Cancel</button></form>
                     {% elif req.status == 'ACCEPTED' %}
                     <a href="{% url 'join_meeting' req.pk %}" class="btn btn-primary btn-sm btn-block">Join Meeting</a>
-                    <form action="{% url 'complete_request' req.pk %}" method="post" onsubmit="return confirm('Confirm completion?');">{% csrf_token %}<button type="submit" class="btn btn-success btn-sm btn-block">Complete</button></form>
-                    <form action="{% url 'cancel_request' req.pk %}" method="post" onsubmit="return confirm('Cancel accepted request?');">{% csrf_token %}<button type="submit" class="btn btn-danger btn-sm btn-block">Cancel</button></form>
+                    <form action="{% url 'complete_request' req.pk %}" method="post" onsubmit="return confirm('Confirm completion? This will release the escrowed hours to {{ req.receiver.username }}.');">{% csrf_token %}<button type="submit" class="btn btn-success btn-sm btn-block">Complete</button></form>
+                    
+                    {% if req.cancellation_requested_by %}
+                        {% if req.cancellation_requested_by == request.user %}
+                        <form action="{% url 'withdraw_cancellation' req.pk %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary btn-sm btn-block" style="font-size:11px;">Withdraw Request</button>
+                        </form>
+                        {% else %}
+                        <form action="{% url 'confirm_cancellation' req.pk %}" method="post" onsubmit="return confirm('Consent to cancel exchange and receive your escrow refund?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm btn-block">Consent & Cancel</button>
+                        </form>
+                        <form action="{% url 'withdraw_cancellation' req.pk %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary btn-sm btn-block">Decline</button>
+                        </form>
+                        {% endif %}
+                    {% else %}
+                        <button type="button" class="btn btn-danger btn-sm btn-block" onclick="document.getElementById('cancel-modal-{{ req.pk }}').style.display='flex'">Request Cancel</button>
+                        
+                        <!-- Cancellation Request Modal -->
+                        <div id="cancel-modal-{{ req.pk }}" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+                            <div class="card" style="max-width:440px; width:100%; border-color:var(--accent-copper); box-shadow:0 12px 36px rgba(0,0,0,0.6);">
+                                <div class="flex justify-between items-center mb-16">
+                                    <h3 class="text-h4 flex items-center gap-8">
+                                        <span class="material-symbols-outlined" style="color:var(--accent-copper);">shield</span>
+                                        Request Cancellation
+                                    </h3>
+                                    <button type="button" onclick="document.getElementById('cancel-modal-{{ req.pk }}').style.display='none'" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer;">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                                <p class="text-small mb-16" style="color:var(--text-secondary);">
+                                    Hours are protected in escrow. To protect both parties from unfair cancellations, canceling an accepted exchange requires receiver consent. The {{ req.hours }} escrowed hours will be returned to you once <strong>{{ req.receiver.username }}</strong> confirms.
+                                </p>
+                                <form action="{% url 'request_cancellation' req.pk %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="form-group mb-16">
+                                        <label class="form-label" for="reason-{{ req.pk }}">Reason (optional):</label>
+                                        <input type="text" name="cancellation_reason" id="reason-{{ req.pk }}" class="form-control" placeholder="e.g. Mutual schedule conflict...">
+                                    </div>
+                                    <div class="flex gap-12 justify-end">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('cancel-modal-{{ req.pk }}').style.display='none'">Keep Active</button>
+                                        <button type="submit" class="btn btn-danger btn-sm">Request Cancellation</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
                     {% elif req.status == 'COMPLETED' %}
                     <a href="{% url 'join_meeting' req.pk %}" class="btn btn-primary btn-sm btn-block">Meeting</a>
                     <a href="{% url 'add_review' user_id=req.receiver.pk %}" class="btn btn-secondary btn-sm btn-block">Review</a>

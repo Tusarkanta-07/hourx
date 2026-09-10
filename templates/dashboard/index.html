@@ -160,6 +160,11 @@
                             <span class="badge {% if req.status == 'PENDING' %}badge-pending{% elif req.status == 'ACCEPTED' %}badge-accepted{% endif %}">
                                 {{ req.get_status_display }}
                             </span>
+                            {% if req.is_cancellation_pending %}
+                            <span class="badge" style="background:rgba(212,132,90,0.15); color:var(--accent-copper); font-size:11px;">
+                                Cancel Pending
+                            </span>
+                            {% endif %}
                             {% if req.status == 'ACCEPTED' %}
                             <a href="{% url 'join_meeting' req.pk %}" class="btn btn-primary btn-sm" style="padding:6px 12px;">
                                 <span class="material-symbols-outlined" style="font-size:16px;">videocam</span>

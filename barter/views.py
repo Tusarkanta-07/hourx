@@ -93,14 +93,83 @@ def reject_request(request, request_id):
 @login_required
 @require_POST
 def cancel_request(request, request_id):
-    # Depending on business logic, maybe only sender can cancel
-    barter_req = get_object_or_404(BarterRequest, id=request_id, sender=request.user)
+    barter_req = get_object_or_404(BarterRequest, id=request_id)
+    if request.user not in [barter_req.sender, barter_req.receiver]:
+        messages.error(request, "You do not have permission to cancel this request.")
+        return redirect('dashboard')
+        
     try:
-        services.cancel_request(request_id)
-        messages.success(request, "Request canceled.")
+        services.cancel_request(request_id, user=request.user)
+        if barter_req.status == 'ACCEPTED':
+            messages.success(request, "Exchange canceled and hours refunded to sender.")
+        else:
+            messages.success(request, "Request canceled.")
     except Exception as e:
         messages.error(request, str(e))
-    return redirect('sent_requests')
+
+    if request.user == barter_req.sender:
+        return redirect('sent_requests')
+    return redirect('received_requests')
+
+@login_required
+@require_POST
+def request_cancellation(request, request_id):
+    barter_req = get_object_or_404(BarterRequest, id=request_id)
+    if request.user not in [barter_req.sender, barter_req.receiver]:
+        messages.error(request, "You do not have permission to request cancellation for this exchange.")
+        return redirect('dashboard')
+
+    reason = request.POST.get('cancellation_reason', '')
+    try:
+        services.request_cancellation(request_id, user=request.user, reason=reason)
+        other_user = barter_req.receiver if request.user == barter_req.sender else barter_req.sender
+        messages.success(request, f"Cancellation request submitted. Awaiting consent from {other_user.username}.")
+    except Exception as e:
+        messages.error(request, str(e))
+
+    if request.user == barter_req.sender:
+        return redirect('sent_requests')
+    return redirect('received_requests')
+
+@login_required
+@require_POST
+def confirm_cancellation(request, request_id):
+    barter_req = get_object_or_404(BarterRequest, id=request_id)
+    if request.user not in [barter_req.sender, barter_req.receiver]:
+        messages.error(request, "You do not have permission to confirm cancellation.")
+        return redirect('dashboard')
+
+    try:
+        services.confirm_cancellation(request_id, user=request.user)
+        messages.success(request, "Cancellation confirmed. Escrowed hours have been refunded to the sender.")
+    except Exception as e:
+        messages.error(request, str(e))
+
+    if request.user == barter_req.sender:
+        return redirect('sent_requests')
+    return redirect('received_requests')
+
+@login_required
+@require_POST
+def withdraw_cancellation(request, request_id):
+    barter_req = get_object_or_404(BarterRequest, id=request_id)
+    if request.user not in [barter_req.sender, barter_req.receiver]:
+        messages.error(request, "You do not have permission to modify this cancellation request.")
+        return redirect('dashboard')
+
+    was_requester = (barter_req.cancellation_requested_by == request.user)
+    try:
+        services.withdraw_cancellation(request_id, user=request.user)
+        if was_requester:
+            messages.success(request, "Cancellation request withdrawn.")
+        else:
+            messages.success(request, "Cancellation request declined. Exchange remains active.")
+    except Exception as e:
+        messages.error(request, str(e))
+
+    if request.user == barter_req.sender:
+        return redirect('sent_requests')
+    return redirect('received_requests')
 
 @login_required
 def join_meeting(request, request_id):
